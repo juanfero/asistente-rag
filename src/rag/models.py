@@ -14,3 +14,16 @@ class Document:
 
     text: str
     metadata: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class Chunk:
+    """Fragmento de un Document con id estable.
+
+    Metadatos: los del Document + `chunk_index` (secuencial por documento/página) y
+    `char_count`.
+    """
+
+    text: str
+    metadata: dict[str, Any]
+    chunk_id: str

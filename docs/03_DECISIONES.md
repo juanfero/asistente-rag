@@ -40,3 +40,10 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
 - **Decisión:** los atributos de `Settings` van en **snake_case minúscula** (`settings.xai_api_key`, `settings.chunk_size`, …). Las variables de entorno y `.env.example` se mantienen en **MAYÚSCULAS**; `pydantic-settings` las mapea porque no distingue mayúsculas/minúsculas (`case_sensitive=False`).
 - **Equivalencia:** toda referencia en la documentación del tipo `settings.XAI_MODEL` equivale a `settings.xai_model` (y así para cada variable).
 - **Consecuencias:** código idiomático sin cambiar la interfaz de configuración (`.env`) que se documenta al usuario.
+
+## ADR-008 — Encabezados pegados a su contenido en el chunking
+- **Fecha:** 2026-10-02 · **Estado:** Aceptada
+- **Contexto:** el autor exige que ningún chunk del corpus sea solo un encabezado (p. ej. "## 5. Día de cumpleaños") sin el contenido que le sigue. Un splitter recursivo puro puede dejar el título al final de un chunk y su contenido en el siguiente.
+- **Decisión:** antes de fusionar, en cada nivel de separación las partes que son encabezado (línea Markdown `#`, título numerado corto sin puntuación final o línea en MAYÚSCULAS, ≤ 80 caracteres) se pegan a la siguiente parte con contenido (`is_heading` + `_glue_headings` en `chunking.py`).
+- **Alternativas:** chunking por secciones Markdown (no sirve para txt/pdf); post-procesar moviendo títulos huérfanos (más complejo y puede romper el límite de tamaño).
+- **Consecuencias:** heurística simple y genérica para los 3 formatos, validada sobre el corpus real con 800/120 y 500/80. Una línea corta en MAYÚSCULAS o numerada sin punto se trataría como título; si aparecen falsos positivos en otros corpus se ajusta la regla.

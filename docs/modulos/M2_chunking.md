@@ -1,6 +1,6 @@
 # M2 — Chunking
 
-**Estado:** ⬜ Pendiente · **Estimado:** 2 h · **Depende de:** M1 · **Requisito:** R2
+**Estado:** ✅ Completado · **Estimado:** 2 h · **Depende de:** M1 · **Requisito:** R2
 
 ## Objetivo
 Dividir cada `Document` en fragmentos (`Chunk`) de tamaño controlado, con solapamiento, respetando en lo posible los límites naturales del texto (párrafo → línea → oración → palabra), y con **IDs estables** para poder citar y re-ingestar sin duplicar.
@@ -10,6 +10,12 @@ Dividir cada `Document` en fragmentos (`Chunk`) de tamaño controlado, con solap
 - `Chunk(text, metadata, chunk_id)` en `models.py`. Metadata hereda la del Document + `chunk_index` (por documento/página), `char_count`.
 - `chunk_id` = `sha1(f"{source}|{page}|{chunk_index}|{text}")[:16]` → determinista.
 - Descartar chunks con < 30 caracteres no vacíos (ruido).
+- *Decisiones del autor (2026-10-02):*
+  - Los tests no dependen de 800/120: M2-01, M2-02 y M2-09 se ejecutan con **(800,120) y (500,80)** (tamaño probable tras M3).
+  - Se fragmenta **por Document** (en PDF, por página): ningún chunk mezcla páginas. Cada chunk es una subcadena contigua de su Document.
+  - Ningún chunk del corpus puede ser solo un encabezado: los encabezados (líneas `#`, títulos numerados cortos sin punto final, líneas en MAYÚSCULAS) se **pegan a la parte siguiente** antes de fusionar (ver ADR-008).
+  - La tabla Markdown de permisos (md §3) queda completa, con su encabezado, en un mismo chunk.
+  - En el `chunk_id`, `page` vale `""` para md/txt (no tienen página).
 - Por qué 800/120 caracteres: los documentos son cortos y con secciones; ~800 caracteres ≈ 1 sección pequeña ≈ 150–200 tokens, cabe holgado en el modelo de embeddings (límite 128 *word pieces* recomendado → **verificar** en M3 y ajustar si trunca; registrar en ADR).
 
 ## Tareas
@@ -40,6 +46,24 @@ pytest -m "not integration" -q && ruff check src tests
 ## Registro de ejecución
 | Fecha | Comando / acción | Resultado | Notas |
 |---|---|---|---|
-| | | | |
+| 2026-10-02 | Vista previa del chunking sobre el corpus real (800/120 y 500/80) | OK | Ningún chunk solo-encabezado ni terminado en encabezado; máx. 785 / 496 caracteres |
+| 2026-10-02 | `pytest tests/unit/test_chunking.py -q` | 48 passed | Pasaron al primer intento → se validaron con 3 mutaciones del código (ver notas) |
+| 2026-10-02 | Mutaciones: sin pegado de encabezados / sin solapamiento / tamaño +50 | 2 / 5 / 11 tests fallan | Las pruebas detectan cada defecto inyectado |
+| 2026-10-02 | `python scripts/inspeccionar_chunks.py --chunk-size 800 --chunk-overlap 120` y `500 80` | OK | `evidencias/M2_estadisticas.txt` |
+| 2026-10-02 | `python scripts/inspeccionar_chunks.py --chunk-size 800 --chunk-overlap 120 --dump` | 16 chunks | `evidencias/M2_chunks_corpus.txt` |
+| 2026-10-02 | `pytest -m "not integration" -v` | 149 passed, 1 deselected | Sin regresiones en M0/M1 |
+| 2026-10-02 | `ruff check src tests && ruff format --check src tests` | All checks passed! / 12 files already formatted | |
+| 2026-10-02 | `git diff --quiet -- data/docs` | Sin cambios | Corpus congelado intacto |
 
-**Estadísticas del corpus:** _(nº chunks por documento, tamaño medio)_
+**Estado de criterios:** M2-01 ✅ · M2-02 ✅ · M2-03 ✅ · M2-04 ✅ · M2-05 ✅ · M2-06 ✅ · M2-07 ✅ · M2-08 ✅ · M2-09 ✅.
+
+**Pruebas adicionales:** `test_no_cross_page_chunks`, `test_no_heading_only_chunks`, `test_is_heading`, `test_markdown_table_in_one_chunk`, `test_no_content_loss_corpus`, `test_overlap_corpus`, `test_no_overlap_when_zero`, `test_prefers_line_then_sentence`, `test_tiny_chunks_discarded`, `test_invalid_parameters`.
+
+**Estadísticas del corpus:**
+
+| Config | txt | pdf p.1 | pdf p.2 | md | Total | Medio | Mín | Máx |
+|---|---|---|---|---|---|---|---|---|
+| 800/120 | 6 | 2 | 2 | 6 | **16** | 573 | 157 | 785 |
+| 500/80 | 8 | 3 | 2 | 9 | **22** | 415 | 245 | 496 |
+
+**Observaciones:** el solapamiento se corta en límite de palabra (como pide el diseño), por lo que algunos chunks empiezan a mitad de frase (p. ej. "de vacaciones" del título 2.1). El último chunk de la página 2 del PDF (157 caracteres con 800/120) es casi todo solapamiento y solo añade "Gastos personales o de acompañantes".

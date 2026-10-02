@@ -1,8 +1,8 @@
 $ pytest -m "not integration" -v
 ============================= test session starts ==============================
-platform linux -- Python 3.10.12, pytest-9.1.1, pluggy-1.6.0 -- /home/pipe/asistente-rag-/asistente-rag-ic7/.venv/bin/python3
+platform linux -- Python 3.10.12, pytest-9.1.1, pluggy-1.6.0 -- <repo>/.venv/bin/python3
 cachedir: .pytest_cache
-rootdir: /home/pipe/asistente-rag-/asistente-rag-ic7
+rootdir: <repo>
 configfile: pyproject.toml
 testpaths: tests
 plugins: cov-7.1.0, anyio-4.15.1

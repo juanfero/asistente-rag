@@ -6,7 +6,7 @@ Regla de oro: **un módulo solo se cierra cuando todas sus pruebas pasan** (`pyt
 |---|---|---|---|---|---|
 | M0 | [Setup y configuración](modulos/M0_setup.md) | Entorno, dependencias, config `.env`, logging, pytest, conexión a Grok verificada | base | — | ✅ Completado (M0-08 ⏸ sin API key) |
 | M1 | [Corpus y carga de documentos](modulos/M1_corpus_loaders.md) | 3 documentos de ejemplo (md, pdf, txt) + loaders con metadatos | R1, R5 | M0 | ✅ Completado |
-| M2 | [Chunking](modulos/M2_chunking.md) | Fragmentación recursiva con solapamiento e IDs estables | R2 | M1 | ⬜ Pendiente |
+| M2 | [Chunking](modulos/M2_chunking.md) | Fragmentación recursiva con solapamiento e IDs estables | R2 | M1 | ✅ Completado |
 | M3 | [Embeddings](modulos/M3_embeddings.md) | Embeddings locales multilingües normalizados | R3 | M0 | ⬜ Pendiente |
 | M4 | [Vector store (Chroma)](modulos/M4_vectorstore.md) | Persistencia, upsert idempotente, consulta por similitud con score | R4, R7 | M2, M3 | ⬜ Pendiente |
 | M5 | [Pipeline de ingesta + CLI](modulos/M5_ingesta.md) | `rag ingest` de punta a punta, re-ingesta idempotente | R1–R5 | M1–M4 | ⬜ Pendiente |
