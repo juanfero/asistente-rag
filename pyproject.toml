@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag"
+version = "0.1.0"
+description = "Asistente documental RAG (prueba técnica IC7): responde solo con documentos internos."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Juan Felipe Rojas" }]
+dependencies = [
+    "openai",
+    "sentence-transformers",
+    "chromadb",
+    "pypdf",
+    "fastapi",
+    "uvicorn[standard]",
+    "python-multipart",
+    "streamlit",
+    "requests",
+    "pydantic-settings",
+    "python-dotenv",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "httpx",
+    "fpdf2",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "--strict-markers"
+markers = [
+    "integration: llama a servicios externos (xAI) o descarga modelos; requiere red/credenciales",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

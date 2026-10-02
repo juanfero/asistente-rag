@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Entornos y secretos
+.venv/
+.env
+
+# Caches de herramientas
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Vector store persistente (se regenera con la ingesta)
+data/chroma/*
+!data/chroma/.gitkeep
