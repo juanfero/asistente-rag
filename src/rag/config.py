@@ -33,8 +33,9 @@ class Settings(BaseSettings):
     chroma_collection: str = "documentos"
 
     # Chunking y recuperación
-    chunk_size: int = Field(default=800, ge=1)
-    chunk_overlap: int = Field(default=120, ge=0)
+    # 500/80: la mayor configuración con ≤ 5 % de chunks sobre 128 tokens (ADR-004)
+    chunk_size: int = Field(default=500, ge=1)
+    chunk_overlap: int = Field(default=80, ge=0)
     top_k: int = Field(default=4, ge=1)
     min_score: float = Field(default=0.35, ge=0.0, le=1.0)
 

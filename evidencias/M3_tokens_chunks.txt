@@ -1,0 +1,14 @@
+$ python scripts/medir_tokens_chunks.py
+Modelo: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+max_seq_length: 128 tokens (incluye 2 tokens especiales por texto)
+Corpus: data/docs (4 documentos/páginas)
+
+| Config | Chunks | Tokens medio | p95 | Máx | > max_seq_length | % excede |
+|---|---|---|---|---|---|---|
+| 800/120 | 16 | 140.8 | 195.5 | 203 | 10 | 62.5 % |
+| 600/90 | 19 | 117.9 | 145.6 | 151 | 6 | 31.6 % |
+| 500/80 | 22 | 103.8 | 121.0 | 136 | 1 | 4.5 % |
+| 400/60 | 30 | 75.7 | 105.5 | 114 | 0 | 0.0 % |
+| 350/50 | 34 | 67.0 | 94.7 | 109 | 0 | 0.0 % |
+
+Recomendación: 500/80 (la más grande con ≤ 5 % truncado)

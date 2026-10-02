@@ -22,7 +22,21 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
 - **Decisión:** _(modelo elegido tras `scripts/check_xai.py`, y por qué: costo/latencia/calidad)_
 
 ## ADR-004 — Tamaño de chunk definitivo
-- **Fecha:** _(M3)_ · **Estado:** Pendiente
+- **Fecha:** 2026-10-02 · **Estado:** Aceptada
+- **Contexto:** `paraphrase-multilingual-MiniLM-L12-v2` tiene `max_seq_length` = 128 tokens (incluye 2 especiales); lo que exceda se trunca y no se representa en el embedding. Con 800/120, el 62,5 % de los chunks se truncaba.
+- **Medición** (`scripts/medir_tokens_chunks.py`, tokenizer real, corpus de M1):
+
+| Config | Chunks | Tokens medio | p95 | Máx | > 128 | % excede |
+|---|---|---|---|---|---|---|
+| 800/120 | 16 | 140.8 | 195.5 | 203 | 10 | 62.5 % |
+| 600/90 | 19 | 117.9 | 145.6 | 151 | 6 | 31.6 % |
+| **500/80** | **22** | **103.8** | **121.0** | **136** | **1** | **4.5 %** |
+| 400/60 | 30 | 75.7 | 105.5 | 114 | 0 | 0.0 % |
+| 350/50 | 34 | 67.0 | 94.7 | 109 | 0 | 0.0 % |
+
+- **Regla:** elegir la configuración más grande con ≤ 5 % de chunks truncados; si quedara por debajo de 400 caracteres, evaluar un modelo con contexto de 512 tokens (p. ej. `intfloat/multilingual-e5-small`).
+- **Decisión:** `CHUNK_SIZE=500`, `CHUNK_OVERLAP=80` (defaults en `config.py` y `.env.example`).
+- **Consecuencias:** 22 chunks en el corpus. Solo 1 chunk (136 tokens) se trunca y lo perdido (8 tokens) está al inicio del chunk siguiente gracias al solapamiento. Se mantiene el modelo (sin cambio de stack). `test_chunks_fit_model` (integración) protege la regla si cambian el corpus o el tamaño.
 
 ## ADR-005 — Umbral de relevancia (MIN_SCORE) y top_k
 - **Fecha:** _(M7)_ · **Estado:** Pendiente

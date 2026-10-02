@@ -33,8 +33,8 @@ def test_defaults() -> None:
     assert s.docs_dir == Path("data/docs")
     assert s.chroma_dir == Path("data/chroma")
     assert s.chroma_collection == "documentos"
-    assert s.chunk_size == 800
-    assert s.chunk_overlap == 120
+    assert s.chunk_size == 500  # ADR-004 (antes 800)
+    assert s.chunk_overlap == 80  # ADR-004 (antes 120)
     assert s.top_k == 4
     assert s.min_score == 0.35
     assert s.api_url == "http://localhost:8000"
@@ -44,14 +44,14 @@ def test_defaults() -> None:
 def test_env_override(monkeypatch: pytest.MonkeyPatch) -> None:
     """M0-03: las variables de entorno (en MAYÚSCULAS) sobreescriben los defaults."""
     monkeypatch.setenv("XAI_MODEL", "grok-otro")
-    monkeypatch.setenv("CHUNK_SIZE", "500")
-    monkeypatch.setenv("CHUNK_OVERLAP", "80")
+    monkeypatch.setenv("CHUNK_SIZE", "700")
+    monkeypatch.setenv("CHUNK_OVERLAP", "90")
     monkeypatch.setenv("TOP_K", "6")
     monkeypatch.setenv("MIN_SCORE", "0.5")
     monkeypatch.setenv("DOCS_DIR", "/tmp/otros_docs")
     s = Settings(_env_file=None)
     assert s.xai_model == "grok-otro"
-    assert (s.chunk_size, s.chunk_overlap, s.top_k) == (500, 80, 6)
+    assert (s.chunk_size, s.chunk_overlap, s.top_k) == (700, 90, 6)
     assert s.min_score == 0.5
     assert s.docs_dir == Path("/tmp/otros_docs")
 
@@ -70,7 +70,7 @@ def test_get_settings_is_cached() -> None:
     assert get_settings() is get_settings()
 
 
-@pytest.mark.parametrize(("size", "overlap"), [(800, 800), (500, 600)])
+@pytest.mark.parametrize(("size", "overlap"), [(500, 500), (500, 600)])
 def test_invalid_overlap(size: int, overlap: int) -> None:
     """M0-04: CHUNK_OVERLAP >= CHUNK_SIZE lanza ValidationError."""
     with pytest.raises(ValidationError, match="CHUNK_OVERLAP"):

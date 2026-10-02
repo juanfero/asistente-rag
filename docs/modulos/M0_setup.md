@@ -26,8 +26,8 @@ Dejar un esqueleto de proyecto instalable y testeable: entorno virtual, dependen
    | `DOCS_DIR` | `data/docs` |
    | `CHROMA_DIR` | `data/chroma` |
    | `CHROMA_COLLECTION` | `documentos` |
-   | `CHUNK_SIZE` | `800` (caracteres) |
-   | `CHUNK_OVERLAP` | `120` |
+   | `CHUNK_SIZE` | `800` (caracteres) → **`500` desde M3 (ADR-004)** |
+   | `CHUNK_OVERLAP` | `120` → **`80` desde M3 (ADR-004)** |
    | `TOP_K` | `4` |
    | `MIN_SCORE` | `0.35` (similitud coseno mínima; se calibra en M7) |
    | `API_URL` | `http://localhost:8000` (para Streamlit) |

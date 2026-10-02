@@ -1,5 +1,5 @@
-$ python scripts/inspeccionar_chunks.py --chunk-size 800 --chunk-overlap 120 --dump
-# 16 chunks · CHUNK_SIZE=800 · CHUNK_OVERLAP=120
+$ python scripts/inspeccionar_chunks.py --dump   # tamaño final 500/80 (ADR-004)
+# 22 chunks · CHUNK_SIZE=500 · CHUNK_OVERLAP=80
 -----
 chunk_id: 312649101b058238
 source: guia_onboarding_ti.txt
@@ -17,13 +17,13 @@ Documento ficticio para prueba técnica.
 
 Esta guía explica los pasos de tecnología que todo colaborador nuevo debe completar durante su primera semana: recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a la red y canales de soporte.
 -----
-chunk_id: 0318ee7f5ad89082
+chunk_id: cbacfb5f3e47269b
 source: guia_onboarding_ti.txt
 page: -
 chunk_index: 1
-caracteres: 522
+caracteres: 487
 texto:
-recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a la red y canales de soporte.
+seguridad de la cuenta, conexión segura a la red y canales de soporte.
 
 2. PRIMER DÍA
 
@@ -31,13 +31,13 @@ recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a l
 - Sus credenciales corporativas (usuario y contraseña temporal) llegan a su correo personal, el que registró durante el proceso de contratación.
 - Al iniciar sesión por primera vez, el sistema le pedirá cambiar la contraseña temporal.
 -----
-chunk_id: 5256a95e958ceacb
+chunk_id: 98f61c7cc51c9f1e
 source: guia_onboarding_ti.txt
 page: -
 chunk_index: 2
-caracteres: 692
+caracteres: 466
 texto:
-- Al iniciar sesión por primera vez, el sistema le pedirá cambiar la contraseña temporal.
+sesión por primera vez, el sistema le pedirá cambiar la contraseña temporal.
 
 3. POLÍTICA DE CONTRASEÑAS
 
@@ -46,18 +46,26 @@ texto:
 - La contraseña se debe cambiar cada 90 días. El sistema le avisará con una semana de anticipación.
 - No se pueden reutilizar las últimas 5 contraseñas.
 - Nunca comparta su contraseña; el personal de soporte jamás se la pedirá.
+-----
+chunk_id: 298d6bc26d1638e9
+source: guia_onboarding_ti.txt
+page: -
+chunk_index: 3
+caracteres: 287
+texto:
+- Nunca comparta su contraseña; el personal de soporte jamás se la pedirá.
 
 4. AUTENTICACIÓN MULTIFACTOR (MFA)
 
 El MFA es obligatorio para todas las cuentas corporativas. Se usa la aplicación Microsoft Authenticator. La Mesa de Ayuda le acompañará en la activación durante el primer día.
 -----
-chunk_id: 9143b691e97c1f56
+chunk_id: 38719427e4c320ae
 source: guia_onboarding_ti.txt
 page: -
-chunk_index: 3
-caracteres: 462
+chunk_index: 4
+caracteres: 416
 texto:
-Se usa la aplicación Microsoft Authenticator. La Mesa de Ayuda le acompañará en la activación durante el primer día.
+La Mesa de Ayuda le acompañará en la activación durante el primer día.
 
 5. VPN
 
@@ -66,13 +74,13 @@ Se usa la aplicación Microsoft Authenticator. La Mesa de Ayuda le acompañará 
 - El uso de la VPN es obligatorio siempre que trabaje fuera de la oficina y necesite acceder a sistemas internos.
 - FortiClient viene instalado en el portátil asignado; solo debe ingresar con sus credenciales corporativas y aprobar la notificación de MFA.
 -----
-chunk_id: ed5bad367ec60083
+chunk_id: ef47567ac458d8f2
 source: guia_onboarding_ti.txt
 page: -
-chunk_index: 4
-caracteres: 784
+chunk_index: 5
+caracteres: 435
 texto:
-en el portátil asignado; solo debe ingresar con sus credenciales corporativas y aprobar la notificación de MFA.
+ingresar con sus credenciales corporativas y aprobar la notificación de MFA.
 
 6. SOPORTE TÉCNICO
 
@@ -81,6 +89,14 @@ en el portátil asignado; solo debe ingresar con sus credenciales corporativas y
 - Horario de atención: lunes a viernes (L-V) de 7:00 a 18:00.
 - Tiempo de respuesta: 4 horas hábiles para incidentes normales y 1 hora para incidentes críticos.
 - Se considera incidente crítico aquel que impide trabajar a un área completa o afecta la operación de despacho.
+-----
+chunk_id: 604aa1e06a1405b3
+source: guia_onboarding_ti.txt
+page: -
+chunk_index: 6
+caracteres: 387
+texto:
+que impide trabajar a un área completa o afecta la operación de despacho.
 
 7. SOFTWARE Y SOLICITUDES
 
@@ -88,23 +104,23 @@ en el portátil asignado; solo debe ingresar con sus credenciales corporativas y
 - Cualquier software adicional, permiso de acceso o requerimiento de TI se solicita por el portal NexaDesk.
 - Las solicitudes de software son revisadas por Seguridad de la Información antes de su aprobación.
 -----
-chunk_id: ae6bbd585745805e
+chunk_id: 957cc1eef2ca2cbb
 source: guia_onboarding_ti.txt
 page: -
-chunk_index: 5
-caracteres: 266
+chunk_index: 7
+caracteres: 245
 texto:
-- Las solicitudes de software son revisadas por Seguridad de la Información antes de su aprobación.
+software son revisadas por Seguridad de la Información antes de su aprobación.
 
 8. RECOMENDACIONES FINALES
 
 Bloquee su equipo (Windows + L) cada vez que se aleje del puesto de trabajo y reporte de inmediato a soporte cualquier correo sospechoso.
 -----
-chunk_id: 66895fe08bcf6e60
+chunk_id: 621894e9d7353d1e
 source: manual_reembolso_gastos.pdf
 page: 1
 chunk_index: 0
-caracteres: 737
+caracteres: 402
 texto:
 Manual de Reembolso de Gastos de Viaje
 Nexa Logística S.A.S. - Gerencia Financiera
@@ -113,20 +129,27 @@ Documento ficticio para prueba técnica.
 1. Alcance
 Este manual define las reglas para solicitar anticipos y legalizar gastos de viaje de los colaboradores de
 Nexa Logística S.A.S. Aplica a viajes nacionales e internacionales realizados por motivos de trabajo.
+-----
+chunk_id: 8ec1ec2c4a770e8d
+source: manual_reembolso_gastos.pdf
+page: 1
+chunk_index: 1
+caracteres: 483
+texto:
+Aplica a viajes nacionales e internacionales realizados por motivos de trabajo.
 2. Legalización de gastos
 - El plazo para legalizar los gastos es de 10 días hábiles después de terminado el viaje.
 - La legalización se presenta en el formato FR-021 (Legalización de gastos de viaje), firmado por el
 colaborador.
 - Todos los soportes deben ser factura electrónica a nombre de Nexa Logística S.A.S., NIT 900.123.456-7.
+No se aceptan recibos de caja menor ni cuentas de cobro sin factura.
 -----
-chunk_id: 2e1c0c01aca43fc2
+chunk_id: f15c3d3342a34e89
 source: manual_reembolso_gastos.pdf
 page: 1
-chunk_index: 1
-caracteres: 536
+chunk_index: 2
+caracteres: 418
 texto:
-colaborador.
-- Todos los soportes deben ser factura electrónica a nombre de Nexa Logística S.A.S., NIT 900.123.456-7.
 No se aceptan recibos de caja menor ni cuentas de cobro sin factura.
 3. Topes diarios de viáticos nacionales
 - Alimentación: COP 120.000 por día.
@@ -136,11 +159,11 @@ No se aceptan recibos de caja menor ni cuentas de cobro sin factura.
 Los valores que superen estos topes son asumidos por el colaborador, salvo autorización previa y escrita del
 gerente de área.
 -----
-chunk_id: 6a651032c66c5372
+chunk_id: 6217a34eab42858d
 source: manual_reembolso_gastos.pdf
 page: 2
 chunk_index: 0
-caracteres: 785
+caracteres: 460
 texto:
 4. Viajes internacionales
 - Para viajes internacionales el tope de alimentación es de USD 90 por día.
@@ -151,6 +174,15 @@ Se pueden solicitar anticipos por un máximo del 70% del presupuesto total del v
 junto con el resto de gastos en el formato FR-021.
 6. Aprobaciones
 - Gastos hasta COP 2.000.000: aprueba el jefe inmediato.
+-----
+chunk_id: abcb2d8a005eb740
+source: manual_reembolso_gastos.pdf
+page: 2
+chunk_index: 1
+caracteres: 436
+texto:
+6. Aprobaciones
+- Gastos hasta COP 2.000.000: aprueba el jefe inmediato.
 - Gastos por encima de COP 2.000.000: aprueba el gerente de área.
 7. Pago del reembolso
 Una vez aprobada la legalización, el reembolso se paga en la siguiente quincena mediante transferencia a la
@@ -159,24 +191,13 @@ cuenta de nómina del colaborador.
 - Bebidas alcohólicas.
 - Multas de tránsito.
 - Consumos de minibar.
------
-chunk_id: 530d124342311571
-source: manual_reembolso_gastos.pdf
-page: 2
-chunk_index: 1
-caracteres: 133
-texto:
-8. Gastos no reembolsables
-- Bebidas alcohólicas.
-- Multas de tránsito.
-- Consumos de minibar.
 - Gastos personales o de acompañantes.
 -----
-chunk_id: cbafcf878d3c42d4
+chunk_id: efd8e417b9373680
 source: politica_vacaciones_y_permisos.md
 page: -
 chunk_index: 0
-caracteres: 646
+caracteres: 496
 texto:
 # Política de Vacaciones y Permisos
 
@@ -188,49 +209,57 @@ texto:
 ## 1. Objetivo y alcance
 
 Esta política establece las reglas para el disfrute de vacaciones, permisos remunerados y licencias de todos los colaboradores con contrato a término indefinido o fijo de Nexa Logística S.A.S. Reemplaza la versión 2.0 y aplica en todas las sedes y centros de distribución.
+-----
+chunk_id: 3ebcecb68856591f
+source: politica_vacaciones_y_permisos.md
+page: -
+chunk_index: 1
+caracteres: 445
+texto:
+la versión 2.0 y aplica en todas las sedes y centros de distribución.
 
 ## 2. Vacaciones
 
 ### 2.1 Días de vacaciones
 
 Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada año trabajado.
------
-chunk_id: 85b63fae64bb4001
-source: politica_vacaciones_y_permisos.md
-page: -
-chunk_index: 1
-caracteres: 328
-texto:
-Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada año trabajado.
 
 Las vacaciones se pueden acumular hasta un **máximo de 2 periodos**. Al completar el segundo periodo acumulado, Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato.
 -----
-chunk_id: 47eb7a8678186cfd
+chunk_id: 8032c85358a67a0e
 source: politica_vacaciones_y_permisos.md
 page: -
 chunk_index: 2
-caracteres: 634
+caracteres: 479
 texto:
-Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato.
+el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato.
 
 ### 2.2 Cómo solicitar vacaciones
 
 1. La solicitud se registra en el portal **NexaPeople**, en la opción "Ausencias > Vacaciones".
 2. Debe hacerse con un **mínimo de 15 días calendario de anticipación** a la fecha de inicio.
 3. El **jefe inmediato aprueba o rechaza la solicitud en un máximo de 3 días hábiles**. Si no hay respuesta en ese plazo, el colaborador puede escalar el caso a Gestión Humana.
-4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda registrada en su historial.
 -----
-chunk_id: ccf38692cf1bb922
+chunk_id: 867c056777872763
 source: politica_vacaciones_y_permisos.md
 page: -
 chunk_index: 3
-caracteres: 759
+caracteres: 473
 texto:
+respuesta en ese plazo, el colaborador puede escalar el caso a Gestión Humana.
 4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda registrada en su historial.
 
 ### 2.3 Fraccionamiento
 
 Las vacaciones se pueden fraccionar en varios bloques, pero **al menos uno de los bloques debe ser de mínimo 6 días hábiles** continuos. Los demás bloques pueden tomarse en periodos más cortos, siempre con la anticipación indicada en el numeral 2.2.
+-----
+chunk_id: 6634b23bed835cc2
+source: politica_vacaciones_y_permisos.md
+page: -
+chunk_index: 4
+caracteres: 441
+texto:
+periodos más cortos, siempre con la anticipación indicada en el numeral 2.2.
 
 ### 2.4 Entrega de pendientes
 
@@ -240,18 +269,26 @@ Antes de iniciar sus vacaciones, el colaborador debe dejar documentados sus pend
 
 Los siguientes permisos se conceden sin descuento y se solicitan también en NexaPeople, adjuntando el soporte correspondiente:
 -----
-chunk_id: 6111b0d044917f4e
+chunk_id: 905a5387c952ab40
 source: politica_vacaciones_y_permisos.md
 page: -
-chunk_index: 4
-caracteres: 699
+chunk_index: 5
+caracteres: 354
 texto:
-permisos se conceden sin descuento y se solicitan también en NexaPeople, adjuntando el soporte correspondiente:
+y se solicitan también en NexaPeople, adjuntando el soporte correspondiente:
 
 | Permiso | Duración | Soporte |
 |---|---|---|
 | Matrimonio | **5 días hábiles** | Registro civil de matrimonio |
 | Calamidad doméstica | **Hasta 5 días** | Soporte del evento (médico, funerario u otro) |
+| Mudanza | **1 día por año** | Contrato de arrendamiento o escritura |
+-----
+chunk_id: 133ff60383a3a93b
+source: politica_vacaciones_y_permisos.md
+page: -
+chunk_index: 6
+caracteres: 381
+texto:
 | Mudanza | **1 día por año** | Contrato de arrendamiento o escritura |
 
 El permiso por calamidad doméstica puede solicitarse el mismo día del evento; el soporte se entrega en un plazo máximo de 5 días hábiles después del regreso.
@@ -261,11 +298,11 @@ El permiso por calamidad doméstica puede solicitarse el mismo día del evento; 
 - **Licencia de paternidad:** 2 semanas, según la ley colombiana.
 - **Licencia de maternidad:** 18 semanas, según la ley colombiana.
 -----
-chunk_id: 09e031c1ff082b16
+chunk_id: 72285686316da5c9
 source: politica_vacaciones_y_permisos.md
 page: -
-chunk_index: 5
-caracteres: 631
+chunk_index: 7
+caracteres: 407
 texto:
 - **Licencia de maternidad:** 18 semanas, según la ley colombiana.
 
@@ -274,6 +311,14 @@ Las licencias se tramitan con Gestión Humana presentando el registro civil de n
 ## 5. Día de cumpleaños
 
 Todo colaborador tiene derecho a **un día libre por su cumpleaños**. Este día **debe tomarse dentro del mes del cumpleaños**; si no se toma en ese mes, se pierde y no es acumulable.
+-----
+chunk_id: 440399a320b200dd
+source: politica_vacaciones_y_permisos.md
+page: -
+chunk_index: 8
+caracteres: 301
+texto:
+mes del cumpleaños**; si no se toma en ese mes, se pierde y no es acumulable.
 
 ## 6. Disposiciones finales
 

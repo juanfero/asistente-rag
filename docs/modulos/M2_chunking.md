@@ -55,6 +55,7 @@ pytest -m "not integration" -q && ruff check src tests
 | 2026-10-02 | `pytest -m "not integration" -v` | 149 passed, 1 deselected | Sin regresiones en M0/M1 |
 | 2026-10-02 | `ruff check src tests && ruff format --check src tests` | All checks passed! / 12 files already formatted | |
 | 2026-10-02 | `git diff --quiet -- data/docs` | Sin cambios | Corpus congelado intacto |
+| 2026-10-02 | (desde M3) Tamaño final 500/80 (ADR-004) | Evidencias regeneradas | `M2_chunks_corpus.txt` ahora con 500/80 (22 chunks); `M2_estadisticas.txt` con 500/80 y 800/120 de referencia |
 | 2026-10-02 | **fix(M2)**: solapamiento en límite natural (línea > oración > palabra) | 58 passed en `test_chunking.py`; 159 passed en total | 10 pruebas nuevas; mutación "solo palabra" → 6 fallan. Evidencias `M2_*.txt` regeneradas |
 
 **Estado de criterios:** M2-01 ✅ · M2-02 ✅ · M2-03 ✅ · M2-04 ✅ · M2-05 ✅ · M2-06 ✅ · M2-07 ✅ · M2-08 ✅ · M2-09 ✅.
