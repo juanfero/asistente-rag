@@ -1,7 +1,7 @@
 # CLAUDE.md — Reglas del proyecto "Asistente Documental RAG (IC7)"
 
 ## Contexto
-Prueba técnica AI Developer Engineer Junior (I Cloud Seven). Asistente RAG en Python que responde **solo** con la información de documentos internos. Documento general: `docs/00_PROYECTO.md`. Caso original: `docs/caso_tecnico_original.md`. Plan: `docs/01_PLAN_MODULOS.md`.
+Prueba técnica AI Developer Engineer Junior (I Cloud Seven). Asistente RAG en Python que responde **solo** con la información de documentos internos. Documento general: `docs/00_PROYECTO.md`. Caso original: `docs/caso_tecnico_original.md` (archivo local, no versionado). Plan: `docs/01_PLAN_MODULOS.md`.
 
 ## Stack fijo (no cambiar sin ADR en docs/03_DECISIONES.md)
 - Python ≥ 3.10, Linux. Paquete en `src/rag/`.

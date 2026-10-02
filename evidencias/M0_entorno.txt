@@ -1,0 +1,12 @@
+$ python --version
+Python 3.10.12
+
+$ pip list | grep -Ei "torch|nvidia"
+torch                                    2.14.1+cpu
+
+$ head -5 requirements.txt
+--extra-index-url https://download.pytorch.org/whl/cpu
+aiohappyeyeballs==2.7.1
+aiohttp==3.14.3
+aiosignal==1.4.0
+altair==6.2.2

@@ -1,0 +1,60 @@
+GUÍA DE ONBOARDING DE TECNOLOGÍA (TI)
+Nexa Logística S.A.S. - Dirección de Tecnología
+Versión 1.3 - Vigente desde 2026-02-01 - Código TI-GUI-002
+
+Documento ficticio para prueba técnica.
+
+
+1. BIENVENIDA
+
+Esta guía explica los pasos de tecnología que todo colaborador nuevo debe completar durante su primera semana: recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a la red y canales de soporte.
+
+
+2. PRIMER DÍA
+
+- Recoja su portátil en la Mesa de Ayuda, ubicada en el piso 3 de la sede principal. Debe presentar su documento de identidad y firmar el acta de entrega del equipo.
+- Sus credenciales corporativas (usuario y contraseña temporal) llegan a su correo personal, el que registró durante el proceso de contratación.
+- Al iniciar sesión por primera vez, el sistema le pedirá cambiar la contraseña temporal.
+
+
+3. POLÍTICA DE CONTRASEÑAS
+
+- La contraseña debe tener un mínimo de 12 caracteres.
+- Debe combinar letras mayúsculas, minúsculas, números y al menos un símbolo.
+- La contraseña se debe cambiar cada 90 días. El sistema le avisará con una semana de anticipación.
+- No se pueden reutilizar las últimas 5 contraseñas.
+- Nunca comparta su contraseña; el personal de soporte jamás se la pedirá.
+
+
+4. AUTENTICACIÓN MULTIFACTOR (MFA)
+
+El MFA es obligatorio para todas las cuentas corporativas. Se usa la aplicación Microsoft Authenticator. La Mesa de Ayuda le acompañará en la activación durante el primer día.
+
+
+5. VPN
+
+- El cliente de VPN corporativo es FortiClient.
+- Servidor: vpn.nexalogistica.co
+- El uso de la VPN es obligatorio siempre que trabaje fuera de la oficina y necesite acceder a sistemas internos.
+- FortiClient viene instalado en el portátil asignado; solo debe ingresar con sus credenciales corporativas y aprobar la notificación de MFA.
+
+
+6. SOPORTE TÉCNICO
+
+- Correo: soporte@nexalogistica.co
+- Extensión telefónica: 4040
+- Horario de atención: lunes a viernes (L-V) de 7:00 a 18:00.
+- Tiempo de respuesta: 4 horas hábiles para incidentes normales y 1 hora para incidentes críticos.
+- Se considera incidente crítico aquel que impide trabajar a un área completa o afecta la operación de despacho.
+
+
+7. SOFTWARE Y SOLICITUDES
+
+- Está prohibido instalar software no autorizado en los equipos corporativos.
+- Cualquier software adicional, permiso de acceso o requerimiento de TI se solicita por el portal NexaDesk.
+- Las solicitudes de software son revisadas por Seguridad de la Información antes de su aprobación.
+
+
+8. RECOMENDACIONES FINALES
+
+Bloquee su equipo (Windows + L) cada vez que se aleje del puesto de trabajo y reporte de inmediato a soporte cualquier correo sospechoso.

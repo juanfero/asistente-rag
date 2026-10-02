@@ -6,4 +6,4 @@ Asistente RAG en Python que responde preguntas **solo** con la información de d
 
 - Documento general: [docs/00_PROYECTO.md](docs/00_PROYECTO.md)
 - Plan de módulos: [docs/01_PLAN_MODULOS.md](docs/01_PLAN_MODULOS.md)
-- Caso técnico original: [docs/caso_tecnico_original.md](docs/caso_tecnico_original.md)
+- Caso técnico original: `docs/caso_tecnico_original.md` (archivo local, no versionado)

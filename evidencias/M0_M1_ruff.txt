@@ -1,0 +1,5 @@
+$ ruff check src tests
+All checks passed!
+
+$ ruff format --check src tests
+10 files already formatted

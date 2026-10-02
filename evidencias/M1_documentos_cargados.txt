@@ -1,0 +1,15 @@
+$ load_directory("data/docs")
+Documentos cargados: 4
+
+source=guia_onboarding_ti.txt | doc_type=txt | page=- | path=data/docs/guia_onboarding_ti.txt | chars=2624
+  primeros 200: 'GUÍA DE ONBOARDING DE TECNOLOGÍA (TI)\nNexa Logística S.A.S. - Dirección de Tecnología\nVersión 1.3 - Vigente desde 2026-02-01 - Código TI-GUI-002\n\nDocumento ficticio para prueba técnica.\n\n1. BIENVENIDA'
+
+source=manual_reembolso_gastos.pdf | doc_type=pdf | page=1 | path=data/docs/manual_reembolso_gastos.pdf | chars=1156
+  primeros 200: 'Manual de Reembolso de Gastos de Viaje\nNexa Logística S.A.S. - Gerencia Financiera\nVersión 3.0 - Vigente desde 2026-01-15 - Código FIN-MAN-007\nDocumento ficticio para prueba técnica.\n1. Alcance\nEste m'
+
+source=manual_reembolso_gastos.pdf | doc_type=pdf | page=2 | path=data/docs/manual_reembolso_gastos.pdf | chars=824
+  primeros 200: '4. Viajes internacionales\n- Para viajes internacionales el tope de alimentación es de USD 90 por día.\n- El hospedaje internacional se reserva a través del área Administrativa según las tarifas del con'
+
+source=politica_vacaciones_y_permisos.md | doc_type=md | page=- | path=data/docs/politica_vacaciones_y_permisos.md | chars=3188
+  primeros 200: '# Política de Vacaciones y Permisos\n\n**Nexa Logística S.A.S.** · Gestión Humana\n**Versión:** 2.1 · **Vigente desde:** 2026-01-15 · **Código:** GH-POL-004\n\n> Documento ficticio para prueba técnica.\n\n##'
+

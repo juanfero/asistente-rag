@@ -3,7 +3,7 @@
 > Prueba técnica **AI Developer Engineer Junior — I Cloud Seven (IC7)**
 > Perfil: *Generative AI, RAG & Cloud Development Foundations* · Tiempo sugerido: 24–36 h
 > Autor: Juan Felipe Rojas · Inicio: 2026-10-01
-> Fuente oficial: [`caso_tecnico_original.md`](caso_tecnico_original.md) (convertido del .docx entregado)
+> Fuente oficial: `caso_tecnico_original.md` (convertido del .docx entregado; archivo local, no versionado)
 
 ---
 
