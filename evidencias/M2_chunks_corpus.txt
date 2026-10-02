@@ -17,13 +17,13 @@ Documento ficticio para prueba técnica.
 
 Esta guía explica los pasos de tecnología que todo colaborador nuevo debe completar durante su primera semana: recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a la red y canales de soporte.
 -----
-chunk_id: d7ea7b0f676e4e82
+chunk_id: 0318ee7f5ad89082
 source: guia_onboarding_ti.txt
 page: -
 chunk_index: 1
-caracteres: 530
+caracteres: 522
 texto:
-semana: recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a la red y canales de soporte.
+recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a la red y canales de soporte.
 
 2. PRIMER DÍA
 
@@ -31,13 +31,12 @@ semana: recepción de equipo, credenciales, seguridad de la cuenta, conexión se
 - Sus credenciales corporativas (usuario y contraseña temporal) llegan a su correo personal, el que registró durante el proceso de contratación.
 - Al iniciar sesión por primera vez, el sistema le pedirá cambiar la contraseña temporal.
 -----
-chunk_id: 38f67474b2ce189c
+chunk_id: 5256a95e958ceacb
 source: guia_onboarding_ti.txt
 page: -
 chunk_index: 2
-caracteres: 720
+caracteres: 692
 texto:
-el proceso de contratación.
 - Al iniciar sesión por primera vez, el sistema le pedirá cambiar la contraseña temporal.
 
 3. POLÍTICA DE CONTRASEÑAS
@@ -89,13 +88,12 @@ en el portátil asignado; solo debe ingresar con sus credenciales corporativas y
 - Cualquier software adicional, permiso de acceso o requerimiento de TI se solicita por el portal NexaDesk.
 - Las solicitudes de software son revisadas por Seguridad de la Información antes de su aprobación.
 -----
-chunk_id: ba1046ef7bf01ffb
+chunk_id: ae6bbd585745805e
 source: guia_onboarding_ti.txt
 page: -
 chunk_index: 5
-caracteres: 283
+caracteres: 266
 texto:
-portal NexaDesk.
 - Las solicitudes de software son revisadas por Seguridad de la Información antes de su aprobación.
 
 8. RECOMENDACIONES FINALES
@@ -162,13 +160,12 @@ cuenta de nómina del colaborador.
 - Multas de tránsito.
 - Consumos de minibar.
 -----
-chunk_id: 40b097ac5397bb59
+chunk_id: 530d124342311571
 source: manual_reembolso_gastos.pdf
 page: 2
 chunk_index: 1
-caracteres: 157
+caracteres: 133
 texto:
-nómina del colaborador.
 8. Gastos no reembolsables
 - Bebidas alcohólicas.
 - Multas de tránsito.
@@ -198,14 +195,12 @@ Esta política establece las reglas para el disfrute de vacaciones, permisos rem
 
 Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada año trabajado.
 -----
-chunk_id: ad2ad5096f888849
+chunk_id: 85b63fae64bb4001
 source: politica_vacaciones_y_permisos.md
 page: -
 chunk_index: 1
-caracteres: 343
+caracteres: 328
 texto:
-de vacaciones
-
 Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada año trabajado.
 
 Las vacaciones se pueden acumular hasta un **máximo de 2 periodos**. Al completar el segundo periodo acumulado, Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato.
@@ -266,13 +261,12 @@ El permiso por calamidad doméstica puede solicitarse el mismo día del evento; 
 - **Licencia de paternidad:** 2 semanas, según la ley colombiana.
 - **Licencia de maternidad:** 18 semanas, según la ley colombiana.
 -----
-chunk_id: b3bf8d86a0921369
+chunk_id: 09e031c1ff082b16
 source: politica_vacaciones_y_permisos.md
 page: -
 chunk_index: 5
-caracteres: 681
+caracteres: 631
 texto:
-paternidad:** 2 semanas, según la ley colombiana.
 - **Licencia de maternidad:** 18 semanas, según la ley colombiana.
 
 Las licencias se tramitan con Gestión Humana presentando el registro civil de nacimiento o la certificación médica correspondiente.

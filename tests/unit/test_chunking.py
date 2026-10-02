@@ -6,6 +6,7 @@ import pytest
 
 from rag.chunking import (
     MIN_CHUNK_CHARS,
+    _overlap_tail,
     chunk_documents,
     is_heading,
     make_chunk_id,
@@ -333,3 +334,62 @@ def test_markdown_table_in_one_chunk(corpus_docs: list[Document], size: int, ove
     assert table.count("\n") == 4  # encabezado + separador + 3 filas
     chunks = chunk_documents([md], size, overlap)
     assert any(table in c.text for c in chunks)
+
+
+# --- Ajuste M2: el solapamiento empieza en un límite natural -------------------------
+
+
+def test_overlap_prefers_newline() -> None:
+    """Con un salto de línea en la ventana, el solapamiento empieza en la línea siguiente."""
+    text = "Una frase. Otra frase con texto. Y otra más\nLínea nueva con contenido"
+    tail = _overlap_tail(text, 45)
+    assert tail == "Línea nueva con contenido"
+
+
+def test_overlap_newline_beats_sentence_end() -> None:
+    """El salto de línea tiene prioridad aunque haya un fin de oración antes en la ventana."""
+    text = "Inicio largo del texto previo. Frase uno. Frase dos\nTres cuatro cinco"
+    tail = _overlap_tail(text, 40)
+    assert ". Frase dos" in text[-40:]
+    assert tail == "Tres cuatro cinco"
+
+
+@pytest.mark.parametrize("sep", [". ", "? ", "! ", ": "])
+def test_overlap_sentence_end(sep: str) -> None:
+    """Sin salto de línea, el solapamiento empieza tras un fin de oración."""
+    text = f"Uno dos tres cuatro cinco seis siete ocho{sep}Nueve diez once doce trece"
+    tail = _overlap_tail(text, 40)
+    assert tail == "Nueve diez once doce trece"
+
+
+def test_overlap_word_fallback() -> None:
+    """Sin salto de línea ni fin de oración, se corta en límite de palabra."""
+    text = "alfa beta gama delta epsilon zeta eta theta iota kappa"
+    tail = _overlap_tail(text, 20)
+    assert len(tail) <= 20 and text.endswith(tail)
+    assert text[len(text) - len(tail) - 1] == " "  # empieza en una palabra completa
+    assert tail.split()[0] in text.split()
+
+
+def test_overlap_edge_cases() -> None:
+    """Presupuesto 0 → sin solapamiento; texto más corto que la ventana → texto completo."""
+    assert _overlap_tail("algo de texto", 0) == ""
+    assert _overlap_tail("corto", 50) == "corto"
+    assert _overlap_tail("palabraextremadamentelargasinespacios", 10) == ""
+
+
+@pytest.mark.parametrize(("size", "overlap"), CORPUS_CONFIGS)
+def test_overlap_starts_at_natural_boundary_corpus(
+    corpus_docs: list[Document], size: int, overlap: int
+) -> None:
+    """En el corpus, ningún chunk (salvo el primero de cada doc.) empieza a mitad de palabra."""
+    chunks = chunk_documents(corpus_docs, size, overlap)
+    by_key = {(d.metadata["source"], d.metadata.get("page")): d.text for d in corpus_docs}
+    after_newline = 0
+    for prev, nxt in _consecutive_pairs(chunks):
+        doc_text = by_key[(nxt.metadata["source"], nxt.metadata.get("page"))]
+        start = doc_text.index(nxt.text, doc_text.index(prev.text) + 1)
+        before = doc_text[:start]
+        assert before[-1].isspace() or before.endswith((". ", "? ", "! ", ": ")), nxt.text[:40]
+        after_newline += before.endswith("\n")
+    assert after_newline > 0

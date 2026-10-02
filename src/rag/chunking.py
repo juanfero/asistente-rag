@@ -8,7 +8,9 @@ Algoritmo:
 2. Los encabezados (líneas Markdown `#`, títulos numerados cortos o líneas en MAYÚSCULAS)
    se pegan a la parte siguiente: un encabezado nunca queda separado de su contenido.
 3. Fusionar partes consecutivas mientras quepan en `chunk_size`; cada chunk nuevo empieza
-   con las últimas ~`chunk_overlap` letras del anterior, cortadas en límite de palabra.
+   con las últimas ~`chunk_overlap` letras del anterior. Dentro de esa ventana, el
+   solapamiento empieza en el primer límite natural disponible, por preferencia: salto de
+   línea, fin de oración (". ", "? ", "! ", ": ") y, si no hay, límite de palabra.
 
 Cada chunk es una subcadena contigua del Document de origen (nunca mezcla páginas).
 """
@@ -23,6 +25,8 @@ SEPARATORS: tuple[str, ...] = ("\n\n", "\n", ". ", " ")
 MIN_CHUNK_CHARS = 30  # chunks con menos caracteres no vacíos se descartan (ruido)
 
 _NUMBERED_TITLE = re.compile(r"^\d+(\.\d+)*\.?\s+\S")
+# Límites donde puede empezar el solapamiento, en orden de preferencia
+_OVERLAP_BOUNDARIES = (re.compile(r"\n"), re.compile(r"[.?!:] "), re.compile(r"\s"))
 _MAX_TITLE_LEN = 80
 
 
@@ -79,16 +83,26 @@ def _split_pieces(text: str, chunk_size: int, separators: tuple[str, ...]) -> li
 
 
 def _overlap_tail(text: str, budget: int) -> str:
-    """Sufijo de `text` de como máximo `budget` caracteres que empieza en límite de palabra."""
+    """Sufijo de `text` (≤ `budget` caracteres) que empieza en el mejor límite natural.
+
+    Preferencia: salto de línea > fin de oración > límite de palabra. Dentro de cada nivel se
+    toma el primer límite de la ventana (el que conserva más solapamiento con contenido).
+    """
     if budget <= 0:
         return ""
-    tail = text[-budget:]
-    if len(text) > budget and not text[-budget - 1].isspace():
-        cut = re.search(r"\s", tail)
-        if cut is None:
-            return ""
-        tail = tail[cut.end() :]
-    return tail if tail.strip() else ""
+    if len(text) <= budget:
+        return text if text.strip() else ""
+    window_start = len(text) - budget
+    for boundary in _OVERLAP_BOUNDARIES:
+        # Se busca desde 2 caracteres antes para detectar un límite justo al borde de la ventana
+        for match in boundary.finditer(text, window_start - 2):
+            if match.end() < window_start:
+                continue
+            tail = text[match.end() :]
+            if tail.strip():
+                return tail
+            break
+    return ""
 
 
 def _merge(pieces: list[str], chunk_size: int, chunk_overlap: int) -> list[str]:

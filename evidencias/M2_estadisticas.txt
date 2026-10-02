@@ -1,11 +1,11 @@
 $ python scripts/inspeccionar_chunks.py --chunk-size 800 --chunk-overlap 120
 === CHUNK_SIZE=800 · CHUNK_OVERLAP=120 ===
 documento                            pág chunks  medio   mín   máx
-guia_onboarding_ti.txt                 -      6    533   283   784
+guia_onboarding_ti.txt                 -      6    524   266   784
 manual_reembolso_gastos.pdf            1      2    636   536   737
-manual_reembolso_gastos.pdf            2      2    471   157   785
-politica_vacaciones_y_permisos.md      -      6    627   343   759
-TOTAL                                        16    573   157   785
+manual_reembolso_gastos.pdf            2      2    459   133   785
+politica_vacaciones_y_permisos.md      -      6    616   328   759
+TOTAL                                        16    564   133   785
 
 Primeros 2 chunks:
 [312649101b058238] guia_onboarding_ti.txt pág=- idx=0
@@ -19,8 +19,8 @@ Documento ficticio para prueba técnica.
 
 Esta guía explica los pasos de tecnología que todo colaborador nuevo debe completar durante su primera semana: recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a la red y canales de soporte.
 -----
-[d7ea7b0f676e4e82] guia_onboarding_ti.txt pág=- idx=1
-semana: recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a la red y canales de soporte.
+[0318ee7f5ad89082] guia_onboarding_ti.txt pág=- idx=1
+recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a la red y canales de soporte.
 
 2. PRIMER DÍA
 
@@ -35,8 +35,8 @@ documento                            pág chunks  medio   mín   máx
 guia_onboarding_ti.txt                 -      8    393   245   487
 manual_reembolso_gastos.pdf            1      3    434   402   483
 manual_reembolso_gastos.pdf            2      2    448   436   460
-politica_vacaciones_y_permisos.md      -      9    421   301   496
-TOTAL                                        22    415   245   496
+politica_vacaciones_y_permisos.md      -      9    420   301   496
+TOTAL                                        22    414   245   496
 
 Primeros 2 chunks:
 [312649101b058238] guia_onboarding_ti.txt pág=- idx=0

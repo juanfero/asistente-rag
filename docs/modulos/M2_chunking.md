@@ -16,6 +16,7 @@ Dividir cada `Document` en fragmentos (`Chunk`) de tamaño controlado, con solap
   - Ningún chunk del corpus puede ser solo un encabezado: los encabezados (líneas `#`, títulos numerados cortos sin punto final, líneas en MAYÚSCULAS) se **pegan a la parte siguiente** antes de fusionar (ver ADR-008).
   - La tabla Markdown de permisos (md §3) queda completa, con su encabezado, en un mismo chunk.
   - En el `chunk_id`, `page` vale `""` para md/txt (no tienen página).
+  - *Ajuste aprobado:* dentro de la ventana de overlap, el chunk siguiente empieza en el primer límite natural disponible, por preferencia: salto de línea, fin de oración (`. `, `? `, `! `, `: `) y, si no hay, límite de palabra.
 - Por qué 800/120 caracteres: los documentos son cortos y con secciones; ~800 caracteres ≈ 1 sección pequeña ≈ 150–200 tokens, cabe holgado en el modelo de embeddings (límite 128 *word pieces* recomendado → **verificar** en M3 y ajustar si trunca; registrar en ADR).
 
 ## Tareas
@@ -54,6 +55,7 @@ pytest -m "not integration" -q && ruff check src tests
 | 2026-10-02 | `pytest -m "not integration" -v` | 149 passed, 1 deselected | Sin regresiones en M0/M1 |
 | 2026-10-02 | `ruff check src tests && ruff format --check src tests` | All checks passed! / 12 files already formatted | |
 | 2026-10-02 | `git diff --quiet -- data/docs` | Sin cambios | Corpus congelado intacto |
+| 2026-10-02 | **fix(M2)**: solapamiento en límite natural (línea > oración > palabra) | 58 passed en `test_chunking.py`; 159 passed en total | 10 pruebas nuevas; mutación "solo palabra" → 6 fallan. Evidencias `M2_*.txt` regeneradas |
 
 **Estado de criterios:** M2-01 ✅ · M2-02 ✅ · M2-03 ✅ · M2-04 ✅ · M2-05 ✅ · M2-06 ✅ · M2-07 ✅ · M2-08 ✅ · M2-09 ✅.
 
@@ -63,7 +65,11 @@ pytest -m "not integration" -q && ruff check src tests
 
 | Config | txt | pdf p.1 | pdf p.2 | md | Total | Medio | Mín | Máx |
 |---|---|---|---|---|---|---|---|---|
-| 800/120 | 6 | 2 | 2 | 6 | **16** | 573 | 157 | 785 |
-| 500/80 | 8 | 3 | 2 | 9 | **22** | 415 | 245 | 496 |
+| 800/120 | 6 | 2 | 2 | 6 | **16** | 564 | 133 | 785 |
+| 500/80 | 8 | 3 | 2 | 9 | **22** | 414 | 245 | 496 |
 
-**Observaciones:** el solapamiento se corta en límite de palabra (como pide el diseño), por lo que algunos chunks empiezan a mitad de frase (p. ej. "de vacaciones" del título 2.1). El último chunk de la página 2 del PDF (157 caracteres con 800/120) es casi todo solapamiento y solo añade "Gastos personales o de acompañantes".
+_(Valores tras el fix(M2) del solapamiento; antes: 800/120 medio 573, mín 157.)_
+
+**Observaciones:**
+- Tras el fix, los chunks empiezan en inicio de línea u oración cuando la ventana de overlap lo permite (p. ej. "Cada colaborador tiene derecho…", "8. Gastos no reembolsables…"); si la ventana no contiene ninguno, empiezan en límite de palabra.
+- **Comportamiento conocido (aceptado por el autor):** el último chunk de la página 2 del PDF (133 caracteres con 800/120) es casi todo solapamiento y solo añade "- Gastos personales o de acompañantes.". Se deja así.
