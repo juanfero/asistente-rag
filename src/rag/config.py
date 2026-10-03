@@ -25,7 +25,11 @@ class Settings(BaseSettings):
     llm_max_tokens: int = Field(default=700, ge=1)
 
     # Embeddings
-    embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    # e5-small: entrenado para recuperar pasajes, 512 tokens (ADR-009)
+    embedding_model: str = "intfloat/multilingual-e5-small"
+    # Prefijos que e5 espera; solo se aplican al codificar (vacíos = sin prefijo)
+    embedding_query_prefix: str = "query: "
+    embedding_passage_prefix: str = "passage: "
 
     # Datos y vector store
     docs_dir: Path = Path("data/docs")
@@ -33,11 +37,12 @@ class Settings(BaseSettings):
     chroma_collection: str = "documentos"
 
     # Chunking y recuperación
-    # 500/80: la mayor configuración con ≤ 5 % de chunks sobre 128 tokens (ADR-004)
-    chunk_size: int = Field(default=500, ge=1)
-    chunk_overlap: int = Field(default=80, ge=0)
+    # 800/120: 0 % de chunks sobre 512 tokens con e5-small (ADR-004, ADR-009)
+    chunk_size: int = Field(default=800, ge=1)
+    chunk_overlap: int = Field(default=120, ge=0)
     top_k: int = Field(default=4, ge=1)
-    min_score: float = Field(default=0.35, ge=0.0, le=1.0)
+    # Provisional: se calibra en M7 (ADR-005) como filtro de ruido, no como abstención
+    min_score: float = Field(default=0.80, ge=0.0, le=1.0)
 
     # Interfaces y logging
     api_url: str = "http://localhost:8000"

@@ -1,0 +1,173 @@
+$ python scripts/comparar_embeddings.py
+## Resumen
+
+| Var. | Modelo y chunk | Chunks | Recall@4 | Rango COP 120.000 (Q2) | MRR Q1–Q6 | mín top-1 Q1–Q6 | máx top-1 Q7–Q9 | Margen | Carga (caché) | Disco |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A | paraphrase-multilingual-MiniLM-L12-v2 500/80 | 22 | 87.5 % | 7 | 0.833 | 0.534 | 0.591 | -0.057 | 7.1 s | 480 MB |
+| B | multilingual-e5-small 500/80 | 22 | 100.0 % | 1 | 0.917 | 0.869 | 0.877 | -0.008 | 4.9 s | 493 MB |
+| C | multilingual-e5-small 800/120 | 16 | 100.0 % | 1 | 1.000 | 0.867 | 0.871 | -0.005 | 4.4 s | 493 MB |
+
+## Top-1 por pregunta
+
+| Var. | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 | Q8 | Q9 |
+|---|---|---|---|---|---|---|---|---|---|
+| A | 0.699 | 0.534 | 0.621 | 0.545 | 0.737 | 0.546 | 0.344 | 0.591 | 0.322 |
+| B | 0.902 | 0.877 | 0.869 | 0.883 | 0.890 | 0.874 | 0.842 | 0.877 | 0.833 |
+| C | 0.900 | 0.867 | 0.885 | 0.883 | 0.884 | 0.870 | 0.861 | 0.871 | 0.834 |
+
+## Detalle top-4 por pregunta (✓ = contiene un hecho gold)
+
+### Variante A: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 · 500/80 · prefijos ''/'' · 22 chunks
+Q1 [Contestable] ¿Cuántos días de vacaciones tengo por año trabajado y con cuánta anticipación debo solicitarlas?
+  1. 0.699 | politica_vacaciones_y_permisos.md pág=- | la versión 2.0 y aplica en todas las sedes y centros de distribución. ⏎  ⏎ ## 2. Vacaciones ⏎  ⏎ #  ✓ 15 días hábiles
+  2. 0.607 | politica_vacaciones_y_permisos.md pág=- | el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato. ⏎  ⏎ ### 2.2 Cómo  ✓ 15 días calendario
+  3. 0.577 | politica_vacaciones_y_permisos.md pág=- | periodos más cortos, siempre con la anticipación indicada en el numeral 2.2. ⏎  ⏎ ### 2.4 Entr
+  4. 0.483 | politica_vacaciones_y_permisos.md pág=- | respuesta en ese plazo, el colaborador puede escalar el caso a Gestión Humana. ⏎ 4. Una vez 
+Q2 [Contestable] ¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?
+  1. 0.534 | manual_reembolso_gastos.pdf pág=2 | 4. Viajes internacionales ⏎ - Para viajes internacionales el tope de alimentación es de USD   ✓ USD 90
+  2. 0.435 | politica_vacaciones_y_permisos.md pág=- | la versión 2.0 y aplica en todas las sedes y centros de distribución. ⏎  ⏎ ## 2. Vacaciones ⏎  ⏎ #
+  3. 0.406 | politica_vacaciones_y_permisos.md pág=- | # Política de Vacaciones y Permisos ⏎  ⏎ **Nexa Logística S.A.S.** · Gestión Humana ⏎ **Versión:
+  4. 0.405 | manual_reembolso_gastos.pdf pág=1 | Manual de Reembolso de Gastos de Viaje ⏎ Nexa Logística S.A.S. - Gerencia Financiera ⏎ Versión
+Q3 [Contestable] ¿Qué requisitos debe cumplir mi contraseña corporativa?
+  1. 0.621 | guia_onboarding_ti.txt pág=- | seguridad de la cuenta, conexión segura a la red y canales de soporte. ⏎  ⏎ 2. PRIMER DÍA ⏎  ⏎ - R
+  2. 0.615 | guia_onboarding_ti.txt pág=- | sesión por primera vez, el sistema le pedirá cambiar la contraseña temporal. ⏎  ⏎ 3. POLÍTICA   ✓ 12 caracteres
+  3. 0.593 | guia_onboarding_ti.txt pág=- | - Nunca comparta su contraseña; el personal de soporte jamás se la pedirá. ⏎  ⏎ 4. AUTENTICACI
+  4. 0.438 | guia_onboarding_ti.txt pág=- | que impide trabajar a un área completa o afecta la operación de despacho. ⏎  ⏎ 7. SOFTWARE Y S
+Q4 [Parcial] ¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?
+  1. 0.545 | politica_vacaciones_y_permisos.md pág=- | la versión 2.0 y aplica en todas las sedes y centros de distribución. ⏎  ⏎ ## 2. Vacaciones ⏎  ⏎ #
+  2. 0.503 | politica_vacaciones_y_permisos.md pág=- | y se solicitan también en NexaPeople, adjuntando el soporte correspondiente: ⏎  ⏎ | Permiso |   ✓ Matrimonio
+  3. 0.495 | politica_vacaciones_y_permisos.md pág=- | - **Licencia de maternidad:** 18 semanas, según la ley colombiana. ⏎  ⏎ Las licencias se trami
+  4. 0.473 | politica_vacaciones_y_permisos.md pág=- | periodos más cortos, siempre con la anticipación indicada en el numeral 2.2. ⏎  ⏎ ### 2.4 Entr
+Q5 [Parcial] ¿Qué VPN debo usar y me prestan un celular corporativo?
+  1. 0.737 | guia_onboarding_ti.txt pág=- | La Mesa de Ayuda le acompañará en la activación durante el primer día. ⏎  ⏎ 5. VPN ⏎  ⏎ - El clien  ✓ FortiClient
+  2. 0.309 | guia_onboarding_ti.txt pág=- | que impide trabajar a un área completa o afecta la operación de despacho. ⏎  ⏎ 7. SOFTWARE Y S
+  3. 0.275 | guia_onboarding_ti.txt pág=- | - Nunca comparta su contraseña; el personal de soporte jamás se la pedirá. ⏎  ⏎ 4. AUTENTICACI
+  4. 0.270 | guia_onboarding_ti.txt pág=- | seguridad de la cuenta, conexión segura a la red y canales de soporte. ⏎  ⏎ 2. PRIMER DÍA ⏎  ⏎ - R
+Q6 [Parcial] ¿Cuál es el tope de hospedaje en Medellín y cuánto reconocen por kilómetro con vehículo propio?
+  1. 0.546 | manual_reembolso_gastos.pdf pág=1 | No se aceptan recibos de caja menor ni cuentas de cobro sin factura. ⏎ 3. Topes diarios de v  ✓ COP 420.000
+  2. 0.429 | manual_reembolso_gastos.pdf pág=2 | 4. Viajes internacionales ⏎ - Para viajes internacionales el tope de alimentación es de USD 
+  3. 0.277 | politica_vacaciones_y_permisos.md pág=- | | Mudanza | **1 día por año** | Contrato de arrendamiento o escritura | ⏎  ⏎ El permiso por ca
+  4. 0.272 | manual_reembolso_gastos.pdf pág=1 | Manual de Reembolso de Gastos de Viaje ⏎ Nexa Logística S.A.S. - Gerencia Financiera ⏎ Versión
+Q7 [No contestable] ¿Cuál es el salario promedio de un analista en Nexa?
+  1. 0.344 | manual_reembolso_gastos.pdf pág=1 | No se aceptan recibos de caja menor ni cuentas de cobro sin factura. ⏎ 3. Topes diarios de v
+  2. 0.328 | manual_reembolso_gastos.pdf pág=2 | 6. Aprobaciones ⏎ - Gastos hasta COP 2.000.000: aprueba el jefe inmediato. ⏎ - Gastos por enci
+  3. 0.298 | manual_reembolso_gastos.pdf pág=2 | 4. Viajes internacionales ⏎ - Para viajes internacionales el tope de alimentación es de USD 
+  4. 0.280 | politica_vacaciones_y_permisos.md pág=- | y se solicitan también en NexaPeople, adjuntando el soporte correspondiente: ⏎  ⏎ | Permiso | 
+Q8 [No contestable] ¿Cuántos días a la semana puedo trabajar remoto?
+  1. 0.591 | politica_vacaciones_y_permisos.md pág=- | la versión 2.0 y aplica en todas las sedes y centros de distribución. ⏎  ⏎ ## 2. Vacaciones ⏎  ⏎ #
+  2. 0.494 | politica_vacaciones_y_permisos.md pág=- | periodos más cortos, siempre con la anticipación indicada en el numeral 2.2. ⏎  ⏎ ### 2.4 Entr
+  3. 0.466 | politica_vacaciones_y_permisos.md pág=- | el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato. ⏎  ⏎ ### 2.2 Cómo
+  4. 0.457 | politica_vacaciones_y_permisos.md pág=- | respuesta en ese plazo, el colaborador puede escalar el caso a Gestión Humana. ⏎ 4. Una vez 
+Q9 [No contestable] ¿Quién es el CEO de Nexa Logística?
+  1. 0.322 | guia_onboarding_ti.txt pág=- | GUÍA DE ONBOARDING DE TECNOLOGÍA (TI) ⏎ Nexa Logística S.A.S. - Dirección de Tecnología ⏎ Vers
+  2. 0.306 | guia_onboarding_ti.txt pág=- | seguridad de la cuenta, conexión segura a la red y canales de soporte. ⏎  ⏎ 2. PRIMER DÍA ⏎  ⏎ - R
+  3. 0.270 | guia_onboarding_ti.txt pág=- | - Nunca comparta su contraseña; el personal de soporte jamás se la pedirá. ⏎  ⏎ 4. AUTENTICACI
+  4. 0.258 | guia_onboarding_ti.txt pág=- | La Mesa de Ayuda le acompañará en la activación durante el primer día. ⏎  ⏎ 5. VPN ⏎  ⏎ - El clien
+
+### Variante B: intfloat/multilingual-e5-small · 500/80 · prefijos 'query: '/'passage: ' · 22 chunks
+Q1 [Contestable] ¿Cuántos días de vacaciones tengo por año trabajado y con cuánta anticipación debo solicitarlas?
+  1. 0.902 | politica_vacaciones_y_permisos.md pág=- | el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato. ⏎  ⏎ ### 2.2 Cómo  ✓ 15 días calendario
+  2. 0.887 | politica_vacaciones_y_permisos.md pág=- | respuesta en ese plazo, el colaborador puede escalar el caso a Gestión Humana. ⏎ 4. Una vez 
+  3. 0.884 | politica_vacaciones_y_permisos.md pág=- | la versión 2.0 y aplica en todas las sedes y centros de distribución. ⏎  ⏎ ## 2. Vacaciones ⏎  ⏎ #  ✓ 15 días hábiles
+  4. 0.877 | politica_vacaciones_y_permisos.md pág=- | periodos más cortos, siempre con la anticipación indicada en el numeral 2.2. ⏎  ⏎ ### 2.4 Entr
+Q2 [Contestable] ¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?
+  1. 0.877 | manual_reembolso_gastos.pdf pág=1 | No se aceptan recibos de caja menor ni cuentas de cobro sin factura. ⏎ 3. Topes diarios de v  ✓ COP 120.000
+  2. 0.871 | manual_reembolso_gastos.pdf pág=2 | 4. Viajes internacionales ⏎ - Para viajes internacionales el tope de alimentación es de USD   ✓ USD 90
+  3. 0.815 | politica_vacaciones_y_permisos.md pág=- | mes del cumpleaños**; si no se toma en ese mes, se pierde y no es acumulable. ⏎  ⏎ ## 6. Dispo
+  4. 0.810 | manual_reembolso_gastos.pdf pág=1 | Aplica a viajes nacionales e internacionales realizados por motivos de trabajo. ⏎ 2. Legaliz
+Q3 [Contestable] ¿Qué requisitos debe cumplir mi contraseña corporativa?
+  1. 0.869 | guia_onboarding_ti.txt pág=- | - Nunca comparta su contraseña; el personal de soporte jamás se la pedirá. ⏎  ⏎ 4. AUTENTICACI
+  2. 0.864 | guia_onboarding_ti.txt pág=- | sesión por primera vez, el sistema le pedirá cambiar la contraseña temporal. ⏎  ⏎ 3. POLÍTICA   ✓ 12 caracteres
+  3. 0.860 | guia_onboarding_ti.txt pág=- | seguridad de la cuenta, conexión segura a la red y canales de soporte. ⏎  ⏎ 2. PRIMER DÍA ⏎  ⏎ - R
+  4. 0.852 | guia_onboarding_ti.txt pág=- | La Mesa de Ayuda le acompañará en la activación durante el primer día. ⏎  ⏎ 5. VPN ⏎  ⏎ - El clien
+Q4 [Parcial] ¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?
+  1. 0.883 | politica_vacaciones_y_permisos.md pág=- | y se solicitan también en NexaPeople, adjuntando el soporte correspondiente: ⏎  ⏎ | Permiso |   ✓ Matrimonio
+  2. 0.872 | politica_vacaciones_y_permisos.md pág=- | | Mudanza | **1 día por año** | Contrato de arrendamiento o escritura | ⏎  ⏎ El permiso por ca
+  3. 0.860 | politica_vacaciones_y_permisos.md pág=- | - **Licencia de maternidad:** 18 semanas, según la ley colombiana. ⏎  ⏎ Las licencias se trami
+  4. 0.849 | politica_vacaciones_y_permisos.md pág=- | el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato. ⏎  ⏎ ### 2.2 Cómo
+Q5 [Parcial] ¿Qué VPN debo usar y me prestan un celular corporativo?
+  1. 0.890 | guia_onboarding_ti.txt pág=- | La Mesa de Ayuda le acompañará en la activación durante el primer día. ⏎  ⏎ 5. VPN ⏎  ⏎ - El clien  ✓ FortiClient
+  2. 0.835 | guia_onboarding_ti.txt pág=- | seguridad de la cuenta, conexión segura a la red y canales de soporte. ⏎  ⏎ 2. PRIMER DÍA ⏎  ⏎ - R
+  3. 0.819 | guia_onboarding_ti.txt pág=- | software son revisadas por Seguridad de la Información antes de su aprobación. ⏎  ⏎ 8. RECOMEN
+  4. 0.817 | politica_vacaciones_y_permisos.md pág=- | y se solicitan también en NexaPeople, adjuntando el soporte correspondiente: ⏎  ⏎ | Permiso | 
+Q6 [Parcial] ¿Cuál es el tope de hospedaje en Medellín y cuánto reconocen por kilómetro con vehículo propio?
+  1. 0.874 | manual_reembolso_gastos.pdf pág=1 | No se aceptan recibos de caja menor ni cuentas de cobro sin factura. ⏎ 3. Topes diarios de v  ✓ COP 420.000
+  2. 0.830 | manual_reembolso_gastos.pdf pág=2 | 4. Viajes internacionales ⏎ - Para viajes internacionales el tope de alimentación es de USD 
+  3. 0.820 | politica_vacaciones_y_permisos.md pág=- | | Mudanza | **1 día por año** | Contrato de arrendamiento o escritura | ⏎  ⏎ El permiso por ca
+  4. 0.816 | politica_vacaciones_y_permisos.md pág=- | y se solicitan también en NexaPeople, adjuntando el soporte correspondiente: ⏎  ⏎ | Permiso | 
+Q7 [No contestable] ¿Cuál es el salario promedio de un analista en Nexa?
+  1. 0.842 | guia_onboarding_ti.txt pág=- | ingresar con sus credenciales corporativas y aprobar la notificación de MFA. ⏎  ⏎ 6. SOPORTE T
+  2. 0.840 | politica_vacaciones_y_permisos.md pág=- | y se solicitan también en NexaPeople, adjuntando el soporte correspondiente: ⏎  ⏎ | Permiso | 
+  3. 0.831 | guia_onboarding_ti.txt pág=- | que impide trabajar a un área completa o afecta la operación de despacho. ⏎  ⏎ 7. SOFTWARE Y S
+  4. 0.831 | manual_reembolso_gastos.pdf pág=1 | Aplica a viajes nacionales e internacionales realizados por motivos de trabajo. ⏎ 2. Legaliz
+Q8 [No contestable] ¿Cuántos días a la semana puedo trabajar remoto?
+  1. 0.877 | politica_vacaciones_y_permisos.md pág=- | la versión 2.0 y aplica en todas las sedes y centros de distribución. ⏎  ⏎ ## 2. Vacaciones ⏎  ⏎ #
+  2. 0.858 | politica_vacaciones_y_permisos.md pág=- | respuesta en ese plazo, el colaborador puede escalar el caso a Gestión Humana. ⏎ 4. Una vez 
+  3. 0.854 | politica_vacaciones_y_permisos.md pág=- | el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato. ⏎  ⏎ ### 2.2 Cómo
+  4. 0.846 | politica_vacaciones_y_permisos.md pág=- | y se solicitan también en NexaPeople, adjuntando el soporte correspondiente: ⏎  ⏎ | Permiso | 
+Q9 [No contestable] ¿Quién es el CEO de Nexa Logística?
+  1. 0.833 | guia_onboarding_ti.txt pág=- | GUÍA DE ONBOARDING DE TECNOLOGÍA (TI) ⏎ Nexa Logística S.A.S. - Dirección de Tecnología ⏎ Vers
+  2. 0.830 | manual_reembolso_gastos.pdf pág=1 | Manual de Reembolso de Gastos de Viaje ⏎ Nexa Logística S.A.S. - Gerencia Financiera ⏎ Versión
+  3. 0.826 | politica_vacaciones_y_permisos.md pág=- | # Política de Vacaciones y Permisos ⏎  ⏎ **Nexa Logística S.A.S.** · Gestión Humana ⏎ **Versión:
+  4. 0.820 | manual_reembolso_gastos.pdf pág=1 | Aplica a viajes nacionales e internacionales realizados por motivos de trabajo. ⏎ 2. Legaliz
+
+### Variante C: intfloat/multilingual-e5-small · 800/120 · prefijos 'query: '/'passage: ' · 16 chunks
+Q1 [Contestable] ¿Cuántos días de vacaciones tengo por año trabajado y con cuánta anticipación debo solicitarlas?
+  1. 0.900 | politica_vacaciones_y_permisos.md pág=- | Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común acuerdo   ✓ 15 días calendario
+  2. 0.889 | politica_vacaciones_y_permisos.md pág=- | 4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda
+  3. 0.883 | politica_vacaciones_y_permisos.md pág=- | Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada añ  ✓ 15 días hábiles
+  4. 0.874 | politica_vacaciones_y_permisos.md pág=- | # Política de Vacaciones y Permisos ⏎  ⏎ **Nexa Logística S.A.S.** · Gestión Humana ⏎ **Versión:  ✓ 15 días hábiles
+Q2 [Contestable] ¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?
+  1. 0.867 | manual_reembolso_gastos.pdf pág=1 | colaborador. ⏎ - Todos los soportes deben ser factura electrónica a nombre de Nexa Logística  ✓ COP 120.000
+  2. 0.863 | manual_reembolso_gastos.pdf pág=2 | 4. Viajes internacionales ⏎ - Para viajes internacionales el tope de alimentación es de USD   ✓ USD 90
+  3. 0.813 | politica_vacaciones_y_permisos.md pág=- | # Política de Vacaciones y Permisos ⏎  ⏎ **Nexa Logística S.A.S.** · Gestión Humana ⏎ **Versión:
+  4. 0.811 | politica_vacaciones_y_permisos.md pág=- | - **Licencia de maternidad:** 18 semanas, según la ley colombiana. ⏎  ⏎ Las licencias se trami
+Q3 [Contestable] ¿Qué requisitos debe cumplir mi contraseña corporativa?
+  1. 0.885 | guia_onboarding_ti.txt pág=- | - Al iniciar sesión por primera vez, el sistema le pedirá cambiar la contraseña temporal. ⏎   ✓ 12 caracteres
+  2. 0.854 | guia_onboarding_ti.txt pág=- | Se usa la aplicación Microsoft Authenticator. La Mesa de Ayuda le acompañará en la activac
+  3. 0.853 | guia_onboarding_ti.txt pág=- | recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a la red y cana
+  4. 0.838 | guia_onboarding_ti.txt pág=- | en el portátil asignado; solo debe ingresar con sus credenciales corporativas y aprobar la
+Q4 [Parcial] ¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?
+  1. 0.883 | politica_vacaciones_y_permisos.md pág=- | permisos se conceden sin descuento y se solicitan también en NexaPeople, adjuntando el sop  ✓ Matrimonio
+  2. 0.870 | politica_vacaciones_y_permisos.md pág=- | - **Licencia de maternidad:** 18 semanas, según la ley colombiana. ⏎  ⏎ Las licencias se trami
+  3. 0.853 | politica_vacaciones_y_permisos.md pág=- | Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada añ
+  4. 0.851 | politica_vacaciones_y_permisos.md pág=- | 4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda
+Q5 [Parcial] ¿Qué VPN debo usar y me prestan un celular corporativo?
+  1. 0.884 | guia_onboarding_ti.txt pág=- | Se usa la aplicación Microsoft Authenticator. La Mesa de Ayuda le acompañará en la activac  ✓ FortiClient
+  2. 0.831 | guia_onboarding_ti.txt pág=- | recepción de equipo, credenciales, seguridad de la cuenta, conexión segura a la red y cana
+  3. 0.821 | guia_onboarding_ti.txt pág=- | - Al iniciar sesión por primera vez, el sistema le pedirá cambiar la contraseña temporal. ⏎ 
+  4. 0.820 | guia_onboarding_ti.txt pág=- | en el portátil asignado; solo debe ingresar con sus credenciales corporativas y aprobar la
+Q6 [Parcial] ¿Cuál es el tope de hospedaje en Medellín y cuánto reconocen por kilómetro con vehículo propio?
+  1. 0.870 | manual_reembolso_gastos.pdf pág=1 | colaborador. ⏎ - Todos los soportes deben ser factura electrónica a nombre de Nexa Logística  ✓ COP 420.000
+  2. 0.841 | manual_reembolso_gastos.pdf pág=2 | 4. Viajes internacionales ⏎ - Para viajes internacionales el tope de alimentación es de USD 
+  3. 0.821 | politica_vacaciones_y_permisos.md pág=- | permisos se conceden sin descuento y se solicitan también en NexaPeople, adjuntando el sop
+  4. 0.818 | politica_vacaciones_y_permisos.md pág=- | - **Licencia de maternidad:** 18 semanas, según la ley colombiana. ⏎  ⏎ Las licencias se trami
+Q7 [No contestable] ¿Cuál es el salario promedio de un analista en Nexa?
+  1. 0.861 | manual_reembolso_gastos.pdf pág=1 | colaborador. ⏎ - Todos los soportes deben ser factura electrónica a nombre de Nexa Logística
+  2. 0.851 | guia_onboarding_ti.txt pág=- | en el portátil asignado; solo debe ingresar con sus credenciales corporativas y aprobar la
+  3. 0.836 | politica_vacaciones_y_permisos.md pág=- | # Política de Vacaciones y Permisos ⏎  ⏎ **Nexa Logística S.A.S.** · Gestión Humana ⏎ **Versión:
+  4. 0.832 | politica_vacaciones_y_permisos.md pág=- | 4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda
+Q8 [No contestable] ¿Cuántos días a la semana puedo trabajar remoto?
+  1. 0.871 | politica_vacaciones_y_permisos.md pág=- | Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada añ
+  2. 0.863 | politica_vacaciones_y_permisos.md pág=- | - **Licencia de maternidad:** 18 semanas, según la ley colombiana. ⏎  ⏎ Las licencias se trami
+  3. 0.863 | politica_vacaciones_y_permisos.md pág=- | 4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda
+  4. 0.857 | politica_vacaciones_y_permisos.md pág=- | Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común acuerdo 
+Q9 [No contestable] ¿Quién es el CEO de Nexa Logística?
+  1. 0.834 | manual_reembolso_gastos.pdf pág=1 | colaborador. ⏎ - Todos los soportes deben ser factura electrónica a nombre de Nexa Logística
+  2. 0.834 | guia_onboarding_ti.txt pág=- | en el portátil asignado; solo debe ingresar con sus credenciales corporativas y aprobar la
+  3. 0.833 | guia_onboarding_ti.txt pág=- | GUÍA DE ONBOARDING DE TECNOLOGÍA (TI) ⏎ Nexa Logística S.A.S. - Dirección de Tecnología ⏎ Vers
+  4. 0.828 | manual_reembolso_gastos.pdf pág=1 | Manual de Reembolso de Gastos de Viaje ⏎ Nexa Logística S.A.S. - Gerencia Financiera ⏎ Versión
+
+
+$ python scripts/medir_tokens_chunks.py --model intfloat/multilingual-e5-small --passage-prefix "passage: " --configs 800:120 500:80
+Modelo: intfloat/multilingual-e5-small
+max_seq_length: 512 tokens (incluye 2 tokens especiales por texto)
+Prefijo de pasaje: 'passage: '
+Corpus: data/docs (4 documentos/páginas)
+
+| Config | Chunks | Tokens medio | p95 | Máx | > max_seq_length | % excede |
+|---|---|---|---|---|---|---|
+| 800/120 | 16 | 142.8 | 197.5 | 205 | 0 | 0.0 % |
+| 500/80 | 22 | 105.8 | 123.0 | 138 | 0 | 0.0 % |
+
+Recomendación: 800/120 (la más grande con ≤ 5 % truncado)

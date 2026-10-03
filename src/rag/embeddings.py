@@ -34,14 +34,24 @@ class Embedder(Protocol):
 class SentenceTransformerEmbedder:
     """Embeddings locales con sentence-transformers en CPU; el modelo se carga en el primer uso.
 
-    `paraphrase-multilingual-MiniLM-L12-v2` no usa prefijos query/passage, así que preguntas y
-    documentos se codifican igual.
+    Prefijos opcionales: algunos modelos de recuperación (p. ej. e5) esperan "query: " en las
+    preguntas y "passage: " en los documentos. Con prefijos vacíos (default) preguntas y
+    documentos se codifican igual, como requiere `paraphrase-multilingual-MiniLM-L12-v2`.
     """
 
-    def __init__(self, model_name: str, batch_size: int = 32, device: str = "cpu") -> None:
+    def __init__(
+        self,
+        model_name: str,
+        batch_size: int = 32,
+        device: str = "cpu",
+        query_prefix: str = "",
+        passage_prefix: str = "",
+    ) -> None:
         self.model_name = model_name
         self.batch_size = batch_size
         self.device = device
+        self.query_prefix = query_prefix
+        self.passage_prefix = passage_prefix
         self._model: Any = None
 
     @property
@@ -69,10 +79,8 @@ class SentenceTransformerEmbedder:
         """Máximo de tokens que el modelo procesa (el resto se trunca)."""
         return int(self.model.max_seq_length)
 
-    def embed_documents(self, texts: list[str]) -> list[list[float]]:
-        """Vectoriza textos en lotes; lista vacía → lista vacía sin cargar el modelo."""
-        if not texts:
-            return []
+    def _encode(self, texts: list[str]) -> list[list[float]]:
+        """Codifica textos (ya prefijados) en lotes, normalizados."""
         vectors = self.model.encode(
             texts,
             batch_size=self.batch_size,
@@ -82,9 +90,15 @@ class SentenceTransformerEmbedder:
         )
         return [[float(x) for x in row] for row in vectors]
 
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        """Vectoriza fragmentos (con `passage_prefix`); lista vacía → [] sin cargar el modelo."""
+        if not texts:
+            return []
+        return self._encode([self.passage_prefix + t for t in texts])
+
     def embed_query(self, text: str) -> list[float]:
-        """Vectoriza una pregunta (misma codificación que los documentos)."""
-        return self.embed_documents([text])[0]
+        """Vectoriza una pregunta (con `query_prefix`)."""
+        return self._encode([self.query_prefix + text])[0]
 
 
 class FakeEmbedder:
@@ -126,4 +140,8 @@ class FakeEmbedder:
 
 def get_embedder(settings: Settings) -> SentenceTransformerEmbedder:
     """Crea el embedder real configurado (sin cargar el modelo todavía)."""
-    return SentenceTransformerEmbedder(settings.embedding_model)
+    return SentenceTransformerEmbedder(
+        settings.embedding_model,
+        query_prefix=settings.embedding_query_prefix,
+        passage_prefix=settings.embedding_passage_prefix,
+    )

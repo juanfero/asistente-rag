@@ -6,7 +6,7 @@ rootdir: <repo>
 configfile: pyproject.toml
 testpaths: tests
 plugins: cov-7.1.0, anyio-4.15.1
-collecting ... collected 171 items / 167 deselected / 4 selected
+collecting ... collected 176 items / 172 deselected / 4 selected
 
 tests/integration/test_embeddings_real.py::test_real_embedder_shape PASSED [ 25%]
 tests/integration/test_embeddings_real.py::test_semantic_sanity PASSED   [ 50%]
@@ -15,4 +15,4 @@ tests/integration/test_xai_connection.py::test_xai_connection SKIPPED    [100%]
 
 =========================== short test summary info ============================
 SKIPPED [1] tests/integration/test_xai_connection.py:20: Sin XAI_API_KEY: se omite la prueba de conexión con xAI
-================= 3 passed, 1 skipped, 167 deselected in 7.58s =================
+================ 3 passed, 1 skipped, 172 deselected in 24.87s =================

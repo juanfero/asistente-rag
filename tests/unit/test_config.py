@@ -29,14 +29,16 @@ def test_defaults() -> None:
     assert s.xai_model == "grok-3-mini"
     assert s.llm_temperature == 0.1
     assert s.llm_max_tokens == 700
-    assert s.embedding_model == "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    assert s.embedding_model == "intfloat/multilingual-e5-small"  # ADR-009
+    assert s.embedding_query_prefix == "query: "
+    assert s.embedding_passage_prefix == "passage: "
     assert s.docs_dir == Path("data/docs")
     assert s.chroma_dir == Path("data/chroma")
     assert s.chroma_collection == "documentos"
-    assert s.chunk_size == 500  # ADR-004 (antes 800)
-    assert s.chunk_overlap == 80  # ADR-004 (antes 120)
+    assert s.chunk_size == 800  # ADR-004/ADR-009
+    assert s.chunk_overlap == 120  # ADR-004/ADR-009
     assert s.top_k == 4
-    assert s.min_score == 0.35
+    assert s.min_score == 0.80  # provisional, se calibra en M7 (ADR-005)
     assert s.api_url == "http://localhost:8000"
     assert s.log_level == "INFO"
 
@@ -70,7 +72,7 @@ def test_get_settings_is_cached() -> None:
     assert get_settings() is get_settings()
 
 
-@pytest.mark.parametrize(("size", "overlap"), [(500, 500), (500, 600)])
+@pytest.mark.parametrize(("size", "overlap"), [(800, 800), (500, 600)])
 def test_invalid_overlap(size: int, overlap: int) -> None:
     """M0-04: CHUNK_OVERLAP >= CHUNK_SIZE lanza ValidationError."""
     with pytest.raises(ValidationError, match="CHUNK_OVERLAP"):
@@ -135,3 +137,15 @@ def test_setup_logging() -> None:
 
     setup_logging("DEBUG")
     assert logging.getLogger().level == logging.DEBUG
+
+
+def test_env_file_prefix_keeps_trailing_space(tmp_path: Path) -> None:
+    """En .env, un prefijo entre comillas conserva el espacio final ("query: ")."""
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        'EMBEDDING_QUERY_PREFIX="query: "\nEMBEDDING_PASSAGE_PREFIX="passage: "\n',
+        encoding="utf-8",
+    )
+    s = Settings(_env_file=env_file)
+    assert s.embedding_query_prefix == "query: "
+    assert s.embedding_passage_prefix == "passage: "

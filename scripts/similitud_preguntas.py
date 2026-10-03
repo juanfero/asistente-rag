@@ -12,7 +12,7 @@ import numpy as np
 
 from rag.chunking import chunk_documents
 from rag.config import get_settings
-from rag.embeddings import SentenceTransformerEmbedder
+from rag.embeddings import get_embedder
 from rag.loaders import load_directory
 
 # Preguntas de docs/modulos/M10_evaluacion.md (el set definitivo se versiona en M10)
@@ -57,7 +57,7 @@ def main() -> None:
     chunks = chunk_documents(
         load_directory(settings.docs_dir), settings.chunk_size, settings.chunk_overlap
     )
-    embedder = SentenceTransformerEmbedder(settings.embedding_model)
+    embedder = get_embedder(settings)
 
     start = time.perf_counter()
     _ = embedder.dimension  # fuerza la carga del modelo
@@ -68,7 +68,8 @@ def main() -> None:
 
     print(
         f"Modelo: {settings.embedding_model} · CHUNK_SIZE={settings.chunk_size} · "
-        f"CHUNK_OVERLAP={settings.chunk_overlap} · {len(chunks)} chunks"
+        f"CHUNK_OVERLAP={settings.chunk_overlap} · prefijos {settings.embedding_query_prefix!r}"
+        f"/{settings.embedding_passage_prefix!r} · {len(chunks)} chunks"
     )
     print(f"Carga del modelo: {load_s:.1f} s · Embeddings del corpus: {corpus_s:.2f} s")
     print("Score = similitud coseno (vectores normalizados → producto punto)\n")

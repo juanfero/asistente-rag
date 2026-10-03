@@ -28,7 +28,7 @@ Dejar el repositorio listo para entregar: README completo según la sección 4.5
 PDFs escaneados sin OCR; sin memoria conversacional; chunking por caracteres (no semántico); umbral de relevancia calibrado con un corpus pequeño; evaluación heurística + manual (no métricas tipo RAGAS); embeddings con límite de 128 tokens; dependencia de la API de xAI (costo, latencia, disponibilidad); sin autenticación; un solo índice/colección.
 
 ### Mejoras futuras (base)
-OCR (Tesseract) y soporte DOCX; búsqueda híbrida (BM25 + vectorial) y *re-ranking* con cross-encoder; chunking semántico; memoria conversacional; streaming de respuestas; evaluación con RAGAS/LLM-as-judge; autenticación y multi-colección por cliente; despliegue cloud (contenedor + Chroma server/pgvector); observabilidad (trazas, costo por consulta).
+OCR (Tesseract) y soporte DOCX; búsqueda híbrida (BM25 + vectorial) y *re-ranking* con cross-encoder; chunking semántico; memoria conversacional; streaming de respuestas; evaluación con RAGAS/LLM-as-judge; autenticación y multi-colección por cliente; despliegue cloud (contenedor + Chroma server/pgvector); observabilidad (trazas, costo por consulta); encabezado de sección en cada chunk (contexto jerárquico; evaluado y descartado en M3.1 porque el recall ya es 100 %).
 
 ## Criterios de aceptación
 | ID | Criterio | Verificación |

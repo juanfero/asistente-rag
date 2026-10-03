@@ -76,7 +76,7 @@ Validar capacidad técnica, criterio de solución, claridad de comunicación y *
 |---|---|---|
 | Lenguaje | Python ≥ 3.10 (Linux) | Requerido por el caso |
 | LLM | **Grok (xAI)** vía SDK `openai` con `base_url=https://api.x.ai/v1` | Elegido por el candidato; API compatible con OpenAI → cliente simple y estándar. Modelo configurable en `.env` (`XAI_MODEL`) |
-| Embeddings | `sentence-transformers` — `paraphrase-multilingual-MiniLM-L12-v2` (384 dim) | Local, gratis, offline, multilingüe (documentos en español) |
+| Embeddings | `sentence-transformers` — `intfloat/multilingual-e5-small` (384 dim, 512 tokens, prefijos `query: `/`passage: `) | Local, gratis, offline, multilingüe y entrenado para recuperar pasajes (ADR-009; reemplazó a `paraphrase-multilingual-MiniLM-L12-v2`) |
 | Vector store | **ChromaDB** persistente (`data/chroma/`), métrica coseno | Local, persistente, guarda metadatos junto al vector |
 | Lectura PDF | `pypdf` | Ligero, extrae texto por página (permite citar página) |
 | Chunking | Implementación propia (recursivo por separadores + solapamiento) | Demuestra comprensión; sin dependencia pesada |

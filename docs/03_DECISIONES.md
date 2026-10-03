@@ -13,16 +13,29 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
 
 ## ADR-002 — Stack: Grok (xAI) + sentence-transformers + ChromaDB + FastAPI/Streamlit, en Linux
 - **Fecha:** 2026-10-01 · **Estado:** Aceptada
-- **Decisión:** LLM Grok vía API compatible con OpenAI (`https://api.x.ai/v1`); embeddings locales multilingües `paraphrase-multilingual-MiniLM-L12-v2`; Chroma persistente con coseno; FastAPI como núcleo y Streamlit como UI; desarrollo en Linux.
+- **Decisión:** LLM Grok vía API compatible con OpenAI (`https://api.x.ai/v1`); embeddings locales multilingües `intfloat/multilingual-e5-small` con prefijos `query: `/`passage: ` (**actualizado por ADR-009**; inicialmente `paraphrase-multilingual-MiniLM-L12-v2`); Chroma persistente con coseno; FastAPI como núcleo y Streamlit como UI; desarrollo en Linux.
 - **Motivo:** elección del candidato para el LLM; embeddings gratis/offline y buenos en español; Chroma guarda metadatos para citar; FastAPI y Streamlit son las opciones recomendadas por el caso.
-- **Consecuencias:** requiere `XAI_API_KEY` con saldo; primera ejecución descarga ~470 MB del modelo de embeddings.
+- **Consecuencias:** requiere `XAI_API_KEY` con saldo; primera ejecución descarga ~490 MB del modelo de embeddings (e5-small).
 
 ## ADR-003 — Modelo Grok concreto
 - **Fecha:** _(M0)_ · **Estado:** Pendiente — sin `XAI_API_KEY` al cierre de M0 (2026-10-02); se mantiene el default `grok-3-mini` hasta ejecutar `scripts/check_xai.py`.
 - **Decisión:** _(modelo elegido tras `scripts/check_xai.py`, y por qué: costo/latencia/calidad)_
 
 ## ADR-004 — Tamaño de chunk definitivo
-- **Fecha:** 2026-10-02 · **Estado:** Aceptada
+- **Fecha:** 2026-10-02 · **Estado:** Aceptada — **actualizada por ADR-009: `CHUNK_SIZE=800`, `CHUNK_OVERLAP=120`**
+- **Actualización (M3.1, e5-small, 512 tokens; medición con prefijo `passage: `):**
+
+| Config | Chunks | Tokens medio | p95 | Máx | > 512 | % excede |
+|---|---|---|---|---|---|---|
+| **800/120** | **16** | **142.8** | **197.5** | **205** | **0** | **0.0 %** |
+| 600/90 | 19 | 119.9 | 147.6 | 153 | 0 | 0.0 % |
+| 500/80 | 22 | 105.8 | 123.0 | 138 | 0 | 0.0 % |
+| 400/60 | 30 | 77.7 | 107.5 | 116 | 0 | 0.0 % |
+| 350/50 | 34 | 69.0 | 96.7 | 111 | 0 | 0.0 % |
+
+  Con e5 ningún tamaño se trunca; se elige el mayor (800/120, 16 chunks) siguiendo la misma regla. La medición original con MiniLM se conserva abajo como historial.
+
+**Historial — medición inicial con MiniLM (128 tokens):**
 - **Contexto:** `paraphrase-multilingual-MiniLM-L12-v2` tiene `max_seq_length` = 128 tokens (incluye 2 especiales); lo que exceda se trunca y no se representa en el embedding. Con 800/120, el 62,5 % de los chunks se truncaba.
 - **Medición** (`scripts/medir_tokens_chunks.py`, tokenizer real, corpus de M1):
 
@@ -35,11 +48,12 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
 | 350/50 | 34 | 67.0 | 94.7 | 109 | 0 | 0.0 % |
 
 - **Regla:** elegir la configuración más grande con ≤ 5 % de chunks truncados; si quedara por debajo de 400 caracteres, evaluar un modelo con contexto de 512 tokens (p. ej. `intfloat/multilingual-e5-small`).
-- **Decisión:** `CHUNK_SIZE=500`, `CHUNK_OVERLAP=80` (defaults en `config.py` y `.env.example`).
-- **Consecuencias:** 22 chunks en el corpus. Solo 1 chunk (136 tokens) se trunca y lo perdido (8 tokens) está al inicio del chunk siguiente gracias al solapamiento. Se mantiene el modelo (sin cambio de stack). `test_chunks_fit_model` (integración) protege la regla si cambian el corpus o el tamaño.
+- **Decisión inicial (sustituida por ADR-009):** `CHUNK_SIZE=500`, `CHUNK_OVERLAP=80`.
+- **Consecuencias (de la decisión inicial):** 22 chunks en el corpus. Solo 1 chunk (136 tokens) se trunca y lo perdido (8 tokens) está al inicio del chunk siguiente gracias al solapamiento. Se mantiene el modelo (sin cambio de stack). `test_chunks_fit_model` (integración) protege la regla si cambian el corpus o el tamaño.
 
 ## ADR-005 — Umbral de relevancia (MIN_SCORE) y top_k
 - **Fecha:** _(M7)_ · **Estado:** Pendiente
+- **Criterio acordado (M3.1):** el margen medido es negativo con todos los modelos (ADR-009), así que `MIN_SCORE` **no** separa contestable de no contestable. Se calibrará como **filtro de ruido**: `MIN_SCORE = (mínimo top-1 de Q1–Q6) − 0.05`; la abstención la decide el LLM con el prompt. Valor provisional: `0.80`.
 
 ## ADR-006 — PyTorch CPU-only
 - **Fecha:** 2026-10-02 · **Estado:** Aceptada
@@ -61,3 +75,32 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
 - **Decisión:** antes de fusionar, en cada nivel de separación las partes que son encabezado (línea Markdown `#`, título numerado corto sin puntuación final o línea en MAYÚSCULAS, ≤ 80 caracteres) se pegan a la siguiente parte con contenido (`is_heading` + `_glue_headings` en `chunking.py`).
 - **Alternativas:** chunking por secciones Markdown (no sirve para txt/pdf); post-procesar moviendo títulos huérfanos (más complejo y puede romper el límite de tamaño).
 - **Consecuencias:** heurística simple y genérica para los 3 formatos, validada sobre el corpus real con 800/120 y 500/80. Una línea corta en MAYÚSCULAS o numerada sin punto se trataría como título; si aparecen falsos positivos en otros corpus se ajusta la regla.
+
+## ADR-009 — Modelo de embeddings: intfloat/multilingual-e5-small (800/120, prefijos)
+- **Fecha:** 2026-10-02 · **Estado:** Aceptada (sustituye la elección de embeddings de ADR-002 y el tamaño de ADR-004)
+- **Contexto:** el diagnóstico de M3 mostró baja discriminación con `paraphrase-multilingual-MiniLM-L12-v2`: Q8 (sin respuesta) 0,591 > Q2 (contestable) 0,534, y el chunk de "COP 120.000" quedaba en el puesto 7 para Q2. MiniLM está entrenado para paráfrasis/similitud semántica (STS), no para recuperar pasajes a partir de una pregunta, y solo admite 128 tokens.
+- **Evaluación** (`scripts/comparar_embeddings.py`, gold set por texto literal; `evidencias/M3_comparacion_embeddings.txt`):
+
+| Var. | Modelo y chunk | Chunks | Recall@4 | Rango COP 120.000 (Q2) | MRR Q1–Q6 | mín top-1 Q1–Q6 | máx top-1 Q7–Q9 | Margen | Carga (caché) | Disco |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A | paraphrase-multilingual-MiniLM-L12-v2 500/80 | 22 | 87.5 % | 7 | 0.833 | 0.534 | 0.591 | -0.057 | 7.1 s* | 480 MB |
+| B | multilingual-e5-small 500/80 | 22 | 100.0 % | 1 | 0.917 | 0.869 | 0.877 | -0.008 | 4.9 s | 493 MB |
+| **C** | **multilingual-e5-small 800/120** | **16** | **100.0 %** | **1** | **1.000** | **0.867** | **0.871** | **-0.004** | **4.4 s** | **493 MB** |
+
+| Var. | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 | Q8 | Q9 |
+|---|---|---|---|---|---|---|---|---|---|
+| A | 0.699 | 0.534 | 0.621 | 0.545 | 0.737 | 0.546 | 0.344 | 0.591 | 0.322 |
+| B | 0.902 | 0.877 | 0.869 | 0.883 | 0.890 | 0.874 | 0.842 | 0.877 | 0.833 |
+| C | 0.900 | 0.867 | 0.885 | 0.883 | 0.884 | 0.870 | 0.861 | 0.871 | 0.834 |
+
+\*La carga de A incluye la importación de `sentence_transformers` (fue la primera variante evaluada).
+
+- **Decisión:** variante **C** — `EMBEDDING_MODEL=intfloat/multilingual-e5-small`, `EMBEDDING_QUERY_PREFIX="query: "`, `EMBEDDING_PASSAGE_PREFIX="passage: "`, `CHUNK_SIZE=800`, `CHUNK_OVERLAP=120`.
+- **Motivo:** e5 está entrenado para recuperación pregunta→pasaje (con prefijos) y admite 512 tokens: Recall@4 100 %, MRR 1,000, Q2 recupera ambas páginas en el top-2 y 0 % de chunks truncados. Misma dimensión (384) y tamaño similar en disco.
+- **Alternativas:** A (MiniLM 500/80, peor recuperación y truncado); B (e5 500/80, MRR 0,917 y más chunks).
+- **Consecuencias:**
+  - Los prefijos **solo** se aplican al codificar; el texto guardado y el `chunk_id` no los llevan (`test_prefix_only_at_encoding`).
+  - e5 concentra las similitudes en ~0,81–0,90 y ningún modelo deja margen positivo: `MIN_SCORE` pasa a ser filtro de ruido (provisional 0,80) y la abstención la decide el LLM (ADR-005).
+  - El criterio M3-04 se redefine: `embed_query`/`embed_documents` son consistentes con su prefijo respectivo, muy similares (> 0,9) y **distintos** entre sí.
+  - Cualquier índice creado con otro modelo debe regenerarse (M4 valida modelo y dimensión de la colección).
+  - Descartado el "encabezado de sección en cada chunk" (recall ya 100 %): queda en Mejoras futuras (M11).

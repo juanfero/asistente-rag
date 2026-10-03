@@ -22,14 +22,14 @@ Dejar un esqueleto de proyecto instalable y testeable: entorno virtual, dependen
    | `XAI_MODEL` | `grok-3-mini` (se ajusta tras listar modelos) |
    | `LLM_TEMPERATURE` | `0.1` |
    | `LLM_MAX_TOKENS` | `700` |
-   | `EMBEDDING_MODEL` | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` |
+   | `EMBEDDING_MODEL` | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` → **`intfloat/multilingual-e5-small` desde M3.1 (ADR-009)**; más `EMBEDDING_QUERY_PREFIX`/`EMBEDDING_PASSAGE_PREFIX` |
    | `DOCS_DIR` | `data/docs` |
    | `CHROMA_DIR` | `data/chroma` |
    | `CHROMA_COLLECTION` | `documentos` |
-   | `CHUNK_SIZE` | `800` (caracteres) → **`500` desde M3 (ADR-004)** |
-   | `CHUNK_OVERLAP` | `120` → **`80` desde M3 (ADR-004)** |
+   | `CHUNK_SIZE` | `800` (caracteres) → `500` en M3 → **`800` desde M3.1 (ADR-004/ADR-009)** |
+   | `CHUNK_OVERLAP` | `120` → `80` en M3 → **`120` desde M3.1 (ADR-004/ADR-009)** |
    | `TOP_K` | `4` |
-   | `MIN_SCORE` | `0.35` (similitud coseno mínima; se calibra en M7) |
+   | `MIN_SCORE` | `0.35` → **`0.80` provisional desde M3.1** (filtro de ruido; se calibra en M7, ADR-005) |
    | `API_URL` | `http://localhost:8000` (para Streamlit) |
    | `LOG_LEVEL` | `INFO` |
    Función `get_settings()` con `lru_cache`. Validaciones: `CHUNK_OVERLAP < CHUNK_SIZE`, `TOP_K ≥ 1`, `0 ≤ MIN_SCORE ≤ 1`.

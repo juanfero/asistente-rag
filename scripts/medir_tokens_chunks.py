@@ -5,6 +5,7 @@ y % de chunks que exceden `max_seq_length` (lo que exceda se trunca al embeber).
 configuración más grande con ≤ 5 % de chunks truncados.
 
 Uso: python scripts/medir_tokens_chunks.py [--configs 800:120 600:90 ...] [--dir data/docs]
+     [--model intfloat/multilingual-e5-small --passage-prefix "passage: "]
 """
 
 import argparse
@@ -28,10 +29,10 @@ def count_tokens(tokenizer, texts: list[str]) -> list[int]:
     ]
 
 
-def measure(docs, tokenizer, max_len: int, size: int, overlap: int) -> dict:
-    """Estadísticas de tokens de los chunks para una configuración."""
+def measure(docs, tokenizer, max_len: int, size: int, overlap: int, prefix: str = "") -> dict:
+    """Estadísticas de tokens de los chunks (con el prefijo de pasaje, si hay)."""
     chunks = chunk_documents(docs, size, overlap)
-    tokens = np.array(count_tokens(tokenizer, [c.text for c in chunks]))
+    tokens = np.array(count_tokens(tokenizer, [prefix + c.text for c in chunks]))
     return {
         "config": f"{size}/{overlap}",
         "size": size,
@@ -51,6 +52,7 @@ def main() -> None:
     parser.add_argument("--configs", nargs="+", default=DEFAULT_CONFIGS)
     parser.add_argument("--dir", default=str(settings.docs_dir))
     parser.add_argument("--model", default=settings.embedding_model)
+    parser.add_argument("--passage-prefix", default=settings.embedding_passage_prefix)
     args = parser.parse_args()
 
     model = SentenceTransformer(args.model, device="cpu")
@@ -60,13 +62,14 @@ def main() -> None:
 
     print(f"Modelo: {args.model}")
     print(f"max_seq_length: {max_len} tokens (incluye {special} tokens especiales por texto)")
+    print(f"Prefijo de pasaje: {args.passage_prefix!r}")
     print(f"Corpus: {args.dir} ({len(docs)} documentos/páginas)\n")
     print("| Config | Chunks | Tokens medio | p95 | Máx | > max_seq_length | % excede |")
     print("|---|---|---|---|---|---|---|")
     rows = []
     for item in args.configs:
         size, overlap = (int(x) for x in item.split(":"))
-        r = measure(docs, tokenizer, max_len, size, overlap)
+        r = measure(docs, tokenizer, max_len, size, overlap, args.passage_prefix)
         rows.append(r)
         print(
             f"| {r['config']} | {r['chunks']} | {r['mean']:.1f} | {r['p95']:.1f} | {r['max']} "

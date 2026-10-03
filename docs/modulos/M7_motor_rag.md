@@ -28,7 +28,7 @@ Responder preguntas **solo con información de los documentos**, citando documen
 1. `src/rag/prompts.py`: `SYSTEM_PROMPT`, `NOT_FOUND_MESSAGE`, `build_user_prompt(question, chunks)`.
 2. `src/rag/rag_engine.py`: `RAGEngine(store, llm, settings).ask(question, top_k=None) -> RAGAnswer`.
 3. CLI: `python -m rag.cli ask "…" [--top-k N] [--show-context]` imprime respuesta + fuentes.
-4. **Calibrar `MIN_SCORE`**: script `scripts/calibrar_umbral.py` que imprime los scores top-k para 5 preguntas contestables y 5 no contestables; elegir un umbral que separe ambos grupos y registrarlo en ADR-005.
+4. **Calibrar `MIN_SCORE` como filtro de ruido** (criterio redefinido en M3.1, ADR-005/ADR-009): el margen entre contestables y no contestables es negativo con todos los modelos medidos, así que el umbral **no** decide la abstención. Script `scripts/calibrar_umbral.py` que imprime los scores top-k de las preguntas de M10 y calcula `MIN_SCORE = (mínimo top-1 de Q1–Q6) − 0.05`; la abstención la decide el LLM con el prompt. Registrar el valor en ADR-005 (provisional: `0.80`).
 
 ## Criterios de aceptación
 | ID | Criterio | Test |

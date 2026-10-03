@@ -6,7 +6,7 @@ Prueba técnica AI Developer Engineer Junior (I Cloud Seven). Asistente RAG en P
 ## Stack fijo (no cambiar sin ADR en docs/03_DECISIONES.md)
 - Python ≥ 3.10, Linux. Paquete en `src/rag/`.
 - LLM: **Grok (xAI)** con SDK `openai`, `base_url=https://api.x.ai/v1`, `XAI_API_KEY`, modelo en `XAI_MODEL`.
-- Embeddings: `sentence-transformers` `paraphrase-multilingual-MiniLM-L12-v2` (local).
+- Embeddings: `sentence-transformers` `intfloat/multilingual-e5-small` (local, prefijos `query: `/`passage: `, chunks 800/120; ADR-009).
 - Vector store: ChromaDB persistente en `data/chroma/`, métrica coseno.
 - PDF: `pypdf`. Chunking: implementación propia.
 - API: FastAPI. UI: Streamlit (consume la API). Config: `pydantic-settings`.
