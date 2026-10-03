@@ -27,3 +27,13 @@ class Chunk:
     text: str
     metadata: dict[str, Any]
     chunk_id: str
+
+
+@dataclass
+class RetrievedChunk:
+    """Chunk recuperado del vector store con su similitud coseno (`score` en [0, 1])."""
+
+    chunk_id: str
+    text: str
+    metadata: dict[str, Any]
+    score: float

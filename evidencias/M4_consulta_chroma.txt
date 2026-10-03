@@ -1,0 +1,24 @@
+$ python scripts/consultar_chroma.py
+Colección: documentos (directorio temporal)
+Metadata de la colección: {'hnsw:space': 'cosine', 'embedding_dim': 384, 'embedding_model': 'intfloat/multilingual-e5-small', 'passage_prefix': 'passage: '}
+count(): 16
+source_stats(): {'guia_onboarding_ti.txt': 6, 'manual_reembolso_gastos.pdf': 4, 'politica_vacaciones_y_permisos.md': 6}
+
+Q1 [Contestable] ¿Cuántos días de vacaciones tengo por año trabajado y con cuánta anticipación debo solicitarlas?
+  1. 0.900 | politica_vacaciones_y_permisos.md pág=- idx=2 | 47eb7a8678186cfd | Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común acuerdo con el jef
+  2. 0.889 | politica_vacaciones_y_permisos.md pág=- idx=3 | ccf38692cf1bb922 | 4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda registrad
+  3. 0.883 | politica_vacaciones_y_permisos.md pág=- idx=1 | 85b63fae64bb4001 | Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada año trabajad
+  4. 0.874 | politica_vacaciones_y_permisos.md pág=- idx=0 | cbafcf878d3c42d4 | # Política de Vacaciones y Permisos ⏎  ⏎ **Nexa Logística S.A.S.** · Gestión Humana ⏎ **Versión:** 2.1 · *
+
+Q2 [Contestable] ¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?
+  1. 0.867 | manual_reembolso_gastos.pdf pág=1 idx=1 | 2e1c0c01aca43fc2 | colaborador. ⏎ - Todos los soportes deben ser factura electrónica a nombre de Nexa Logística S.A.S., N
+  2. 0.863 | manual_reembolso_gastos.pdf pág=2 idx=0 | 6a651032c66c5372 | 4. Viajes internacionales ⏎ - Para viajes internacionales el tope de alimentación es de USD 90 por día
+  3. 0.813 | politica_vacaciones_y_permisos.md pág=- idx=0 | cbafcf878d3c42d4 | # Política de Vacaciones y Permisos ⏎  ⏎ **Nexa Logística S.A.S.** · Gestión Humana ⏎ **Versión:** 2.1 · *
+  4. 0.811 | politica_vacaciones_y_permisos.md pág=- idx=5 | 09e031c1ff082b16 | - **Licencia de maternidad:** 18 semanas, según la ley colombiana. ⏎  ⏎ Las licencias se tramitan con Ge
+
+Q8 [No contestable] ¿Cuántos días a la semana puedo trabajar remoto?
+  1. 0.871 | politica_vacaciones_y_permisos.md pág=- idx=1 | 85b63fae64bb4001 | Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada año trabajad
+  2. 0.863 | politica_vacaciones_y_permisos.md pág=- idx=5 | 09e031c1ff082b16 | - **Licencia de maternidad:** 18 semanas, según la ley colombiana. ⏎  ⏎ Las licencias se tramitan con Ge
+  3. 0.863 | politica_vacaciones_y_permisos.md pág=- idx=3 | ccf38692cf1bb922 | 4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda registrad
+  4. 0.857 | politica_vacaciones_y_permisos.md pág=- idx=2 | 47eb7a8678186cfd | Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común acuerdo con el jef
+
