@@ -41,7 +41,8 @@ Responder preguntas **solo con información de los documentos**, citando documen
 | M7-06 | Citas fuera de rango (`[9]`) se ignoran sin error | `test_invalid_citation_index` |
 | M7-07 | `top_k` del argumento sobrescribe el de settings | `test_top_k_override` |
 | M7-08 | El LLM devuelve `NOT_FOUND_MESSAGE` → `grounded=False` | `test_llm_not_found_phrase` |
-| M7-09 *(integration)* | Con corpus real + Grok: "¿Cuántos días de vacaciones tengo al año?" → contiene "15" y cita `politica_vacaciones_y_permisos.md` | `test_e2e_answerable` |
+| M7-09 *(integration)* | Con corpus real + Gemini: "¿Cuántos días de vacaciones tengo al año?" → contiene "15" y cita `politica_vacaciones_y_permisos.md` | `test_e2e_answerable` |
+| M7-11 | Errores del LLM en la CLI (`ask`): `LLMQuotaExhaustedError`, `LLMAuthError`, `LLMRateLimitError` → se imprime el mensaje en español y se sale con **código 2**, sin traceback (ADR-010) | `test_cli_llm_errors` |
 | M7-10 *(integration)* | "¿Cuál es el precio de la acción de Nexa en bolsa?" → respuesta de no encontrado | `test_e2e_unanswerable` |
 
 ## Verificación

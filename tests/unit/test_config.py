@@ -11,7 +11,7 @@ from rag.logging_conf import LOG_FORMAT, setup_logging
 
 pytestmark = pytest.mark.usefixtures("clean_env")
 
-FAKE_KEY = "xai-test-NO-REAL-0123456789"
+FAKE_KEY = "test-key-NO-REAL-0123456789"
 
 
 def test_import_package() -> None:
@@ -24,9 +24,9 @@ def test_import_package() -> None:
 def test_defaults() -> None:
     """M0-02: sin .env ni variables se cargan los defaults documentados."""
     s = Settings(_env_file=None)
-    assert s.xai_api_key is None
-    assert s.xai_base_url == "https://api.x.ai/v1"
-    assert s.xai_model == "grok-3-mini"
+    assert s.gemini_api_key is None
+    assert s.gemini_base_url == "https://generativelanguage.googleapis.com/v1beta/openai/"
+    assert s.gemini_model == "gemini-3.1-flash-lite"  # ADR-010
     assert s.llm_temperature == 0.1
     assert s.llm_max_tokens == 700
     assert s.embedding_model == "intfloat/multilingual-e5-small"  # ADR-009
@@ -45,14 +45,14 @@ def test_defaults() -> None:
 
 def test_env_override(monkeypatch: pytest.MonkeyPatch) -> None:
     """M0-03: las variables de entorno (en MAYÚSCULAS) sobreescriben los defaults."""
-    monkeypatch.setenv("XAI_MODEL", "grok-otro")
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-otro")
     monkeypatch.setenv("CHUNK_SIZE", "700")
     monkeypatch.setenv("CHUNK_OVERLAP", "90")
     monkeypatch.setenv("TOP_K", "6")
     monkeypatch.setenv("MIN_SCORE", "0.5")
     monkeypatch.setenv("DOCS_DIR", "/tmp/otros_docs")
     s = Settings(_env_file=None)
-    assert s.xai_model == "grok-otro"
+    assert s.gemini_model == "gemini-otro"
     assert (s.chunk_size, s.chunk_overlap, s.top_k) == (700, 90, 6)
     assert s.min_score == 0.5
     assert s.docs_dir == Path("/tmp/otros_docs")
@@ -61,9 +61,9 @@ def test_env_override(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_env_file_is_read(tmp_path: Path) -> None:
     """Complemento M0-03: un archivo .env también sobreescribe los defaults."""
     env_file = tmp_path / ".env"
-    env_file.write_text("XAI_MODEL=grok-desde-env\nTOP_K=2\n", encoding="utf-8")
+    env_file.write_text("GEMINI_MODEL=gemini-desde-env\nTOP_K=2\n", encoding="utf-8")
     s = Settings(_env_file=env_file)
-    assert s.xai_model == "grok-desde-env"
+    assert s.gemini_model == "gemini-desde-env"
     assert s.top_k == 2
 
 
@@ -101,12 +101,12 @@ def test_secret_not_exposed(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """M0-06: la API key no aparece en repr/str/dump ni en logs."""
-    monkeypatch.setenv("XAI_API_KEY", FAKE_KEY)
+    monkeypatch.setenv("GEMINI_API_KEY", FAKE_KEY)
     s = Settings(_env_file=None)
     logger = logging.getLogger("rag.test")
 
-    assert s.xai_api_key is not None
-    assert s.xai_api_key.get_secret_value() == FAKE_KEY
+    assert s.gemini_api_key is not None
+    assert s.gemini_api_key.get_secret_value() == FAKE_KEY
     assert FAKE_KEY not in repr(s)
     assert FAKE_KEY not in str(s)
     assert FAKE_KEY not in s.model_dump_json()
@@ -114,14 +114,14 @@ def test_secret_not_exposed(
     # Registros capturados por pytest
     with caplog.at_level(logging.DEBUG):
         logger.info("Configuración cargada: %s", s)
-        logger.debug("Key: %s", s.xai_api_key)
+        logger.debug("Key: %s", s.gemini_api_key)
     assert caplog.records
     assert FAKE_KEY not in caplog.text
 
     # Salida real formateada por el handler del proyecto
     setup_logging("DEBUG")
     logger.info("Configuración cargada: %s", s)
-    logger.debug("Key: %s", s.xai_api_key)
+    logger.debug("Key: %s", s.gemini_api_key)
     stderr = capsys.readouterr().err
     assert "Configuración cargada" in stderr
     assert FAKE_KEY not in stderr

@@ -38,7 +38,7 @@ OCR (Tesseract) y soporte DOCX; búsqueda híbrida (BM25 + vectorial) y *re-rank
 | M11-03 | `pytest -m "not integration"` verde y cobertura ≥ 80% en `src/rag` (excluye `ui_streamlit.py`) | `pytest --cov=rag` |
 | M11-04 | Existen `evaluacion/resultados.md`, evidencias y `docs/04_USO_AI_ASSISTED.md` completo | checklist |
 | M11-05 | Video ≤ 5 min grabado y enlazado | checklist |
-| M11-06 | `.env` y `data/chroma` no están en el repo; no hay claves en el historial | `git log -p | grep -i "xai-"` vacío |
+| M11-06 | `.env` y `data/chroma` no están en el repo; no hay claves en el historial | `git check-ignore .env`; `git log --all -p \| grep -E "AIza\|AQ\."` vacío; `pytest tests/unit/test_no_secrets.py` (patrones `AIza[0-9A-Za-z_-]{35}`, `AQ\.[0-9A-Za-z_-]{20,}`, `GEMINI_API_KEY=` con valor); hook `scripts/pre-commit` instalado |
 
 ## Checklist de entrega (sección 5 del caso)
 - [ ] Repositorio de código

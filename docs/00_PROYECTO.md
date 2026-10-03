@@ -15,7 +15,7 @@ Un cliente necesita un **asistente que responda preguntas usando únicamente la 
 2. Los divide en fragmentos (*chunking*).
 3. Genera **embeddings locales** con `sentence-transformers`.
 4. Los guarda en un **vector store local persistente (ChromaDB)**.
-5. Recibe una pregunta, recupera los fragmentos más similares y genera la respuesta con **Grok (xAI)**.
+5. Recibe una pregunta, recupera los fragmentos más similares y genera la respuesta con **Gemini** (ADR-010; antes Grok).
 6. Devuelve la respuesta **con referencia al documento y fragmento usados**, y responde explícitamente *"no encontré esa información en los documentos"* cuando no hay contexto suficiente.
 
 Se expone mediante una **API FastAPI** (núcleo) y una **interfaz Streamlit** (demo), más una **CLI** de consola.
@@ -75,7 +75,7 @@ Validar capacidad técnica, criterio de solución, claridad de comunicación y *
 | Componente | Elección | Motivo |
 |---|---|---|
 | Lenguaje | Python ≥ 3.10 (Linux) | Requerido por el caso |
-| LLM | **Grok (xAI)** vía SDK `openai` con `base_url=https://api.x.ai/v1` | Elegido por el candidato; API compatible con OpenAI → cliente simple y estándar. Modelo configurable en `.env` (`XAI_MODEL`) |
+| LLM | **Gemini** (`gemini-3.1-flash-lite`) vía SDK `openai` con `base_url=https://generativelanguage.googleapis.com/v1beta/openai/` | Grok no funcionó para el candidato y Gemini sí (ADR-010); endpoint compatible con OpenAI → cliente simple y estándar. Modelo configurable en `.env` (`GEMINI_MODEL`) |
 | Embeddings | `sentence-transformers` — `intfloat/multilingual-e5-small` (384 dim, 512 tokens, prefijos `query: `/`passage: `) | Local, gratis, offline, multilingüe y entrenado para recuperar pasajes (ADR-009; reemplazó a `paraphrase-multilingual-MiniLM-L12-v2`) |
 | Vector store | **ChromaDB** persistente (`data/chroma/`), métrica coseno | Local, persistente, guarda metadatos junto al vector |
 | Lectura PDF | `pypdf` | Ligero, extrae texto por página (permite citar página) |
@@ -83,7 +83,7 @@ Validar capacidad técnica, criterio de solución, claridad de comunicación y *
 | API | FastAPI + Uvicorn | Opción recomendada por el caso; Swagger automático |
 | UI | Streamlit (consume la API) | Opción recomendada; ideal para el video |
 | Config | `pydantic-settings` + `.env` | Config tipada y centralizada |
-| Pruebas | `pytest`, `pytest-cov`; marcador `integration` para pruebas que llaman a Grok | Unitarias sin red/costo; integración opcional |
+| Pruebas | `pytest`, `pytest-cov`; marcador `integration` para pruebas que llaman a Gemini o descargan modelos | Unitarias sin red/costo; integración opcional |
 | Calidad | `ruff` (lint + format) | Rápido, estándar |
 
 > Por qué **no** LangChain/LlamaIndex: el caso evalúa *entender lo que hiciste*. Implementar el pipeline con piezas pequeñas y explícitas facilita explicarlo en el video y en la sustentación. Se documenta en `docs/03_DECISIONES.md` (ADR-001).
@@ -104,7 +104,7 @@ Validar capacidad técnica, criterio de solución, claridad de comunicación y *
                 │          ¿hay contexto relevante? ── no ──► "No encontré esa información…"
                 │                     │ sí
                 │                     ▼
-                │   prompts.py (contexto numerado [1]..[k] + reglas) ─► llm.py (Grok/xAI)
+                │   prompts.py (contexto numerado [1]..[k] + reglas) ─► llm.py (Gemini)   
                 │                     ▼
                 │   RespuestaRAG { answer, sources:[doc, página, chunk_id, score, extracto] }
                 └───────────────────────────────────────────────────────────┘
@@ -129,7 +129,7 @@ asistente-rag-ic7/
 │   ├── embeddings.py          # M3
 │   ├── vectorstore.py         # M4
 │   ├── ingest.py              # M5  pipeline de ingesta
-│   ├── llm.py                 # M6  cliente Grok (xAI) + FakeLLM para tests
+│   ├── llm.py                 # M6  cliente Gemini + FakeLLM para tests
 │   ├── prompts.py             # M7
 │   ├── rag_engine.py          # M7  retrieve + generate + citas
 │   ├── cli.py                 # M5/M7
@@ -169,7 +169,9 @@ Plan de módulos detallado: [`01_PLAN_MODULOS.md`](01_PLAN_MODULOS.md).
 
 | Riesgo | Mitigación |
 |---|---|
-| Nombre de modelo Grok cambia / no disponible | Modelo en `.env`; M0 lista modelos vía `GET /v1/models` y fija uno válido |
+| Nombre de modelo Gemini cambia / no disponible | Modelo en `.env`; `scripts/check_gemini.py` lista los modelos de la key y confirma el configurado |
+| Créditos de la API key agotados | `LLMQuotaExhaustedError` con mensaje claro en CLI/API/UI para cambiar `GEMINI_API_KEY` (M6–M9) |
+| Fuga de la API key | `.env` ignorado, `test_no_secrets.py`, hook `scripts/pre-commit`, la key nunca se imprime (solo `****` + últimos 4) |
 | Costo o falta de saldo en xAI | Tests unitarios usan `FakeLLM`; solo los tests `integration` llaman a la API |
 | Alucinaciones | Prompt estricto, umbral de similitud, respuesta de "no encontrado", citas obligatorias |
 | Primera descarga del modelo de embeddings (~470 MB) | Se descarga una vez en M3 y queda en caché; documentado en README |
@@ -186,7 +188,7 @@ Plan de módulos detallado: [`01_PLAN_MODULOS.md`](01_PLAN_MODULOS.md).
 | M3 Embeddings | 2 |
 | M4 Vector store | 2.5 |
 | M5 Pipeline de ingesta + CLI | 2 |
-| M6 Cliente LLM Grok | 2 |
+| M6 Cliente LLM Gemini | 2 |
 | M7 Motor RAG | 4 |
 | M8 API FastAPI | 3 |
 | M9 UI Streamlit | 2.5 |

@@ -20,7 +20,7 @@ Exponer ingesta y consultas como API REST documentada (Swagger en `/docs`), reut
 - Dependencias pesadas (embedder, Chroma, LLM) se crean en `lifespan` una sola vez.
 - Esquemas Pydantic de request/response en `src/rag/schemas.py`.
 - Validaciones: extensión permitida, tamaño máx. 10 MB por archivo, nombre saneado (`Path(name).name`, sin `..`).
-- Errores: 400 validación, 413 archivo grande, 415 tipo no soportado, 502 `LLMError` con mensaje claro, 404 documento inexistente.
+- Errores: 400 validación, 413 archivo grande, 415 tipo no soportado, 502 `LLMError` genérico con mensaje claro; `LLMQuotaExhaustedError` → **503** `{"error":"LLM_QUOTA_EXHAUSTED","detail":<mensaje>}`, `LLMAuthError` → **503** `"LLM_AUTH_ERROR"`, `LLMRateLimitError` → **429** (ADR-010), 404 documento inexistente.
 - CORS habilitado para `localhost:8501` (Streamlit).
 
 ## Criterios de aceptación (TestClient + FakeEmbedder + FakeLLM + `tmp_path`)
@@ -36,6 +36,7 @@ Exponer ingesta y consultas como API REST documentada (Swagger en `/docs`), reut
 | M8-08 | `LLMError` → 502 con detalle legible | `test_llm_error_502` |
 | M8-09 | `DELETE /documents/{source}` elimina; inexistente → 404 | `test_delete_document` |
 | M8-10 | Swagger `/docs` y `/openapi.json` disponibles | `test_openapi` |
+| M8-11 | `LLMQuotaExhaustedError` → 503 `{"error":"LLM_QUOTA_EXHAUSTED","detail":…}`; `LLMAuthError` → 503 `"LLM_AUTH_ERROR"`; `LLMRateLimitError` → 429 | `test_llm_specific_errors` |
 
 ## Verificación
 ```bash

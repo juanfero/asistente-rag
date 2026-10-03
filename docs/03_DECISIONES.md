@@ -11,15 +11,18 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
 - **Alternativas:** LangChain, LlamaIndex (más rápidos de armar, pero ocultan el mecanismo y añaden dependencias).
 - **Consecuencias:** más código propio, pero cada paso es testeable y explicable en el video.
 
-## ADR-002 — Stack: Grok (xAI) + sentence-transformers + ChromaDB + FastAPI/Streamlit, en Linux
+## ADR-002 — Stack: LLM vía API compatible con OpenAI + sentence-transformers + ChromaDB + FastAPI/Streamlit, en Linux
 - **Fecha:** 2026-10-01 · **Estado:** Aceptada
-- **Decisión:** LLM Grok vía API compatible con OpenAI (`https://api.x.ai/v1`); embeddings locales multilingües `intfloat/multilingual-e5-small` con prefijos `query: `/`passage: ` (**actualizado por ADR-009**; inicialmente `paraphrase-multilingual-MiniLM-L12-v2`); Chroma persistente con coseno; FastAPI como núcleo y Streamlit como UI; desarrollo en Linux.
+- **Decisión:** LLM **Gemini** vía endpoint compatible con OpenAI (`https://generativelanguage.googleapis.com/v1beta/openai/`) (**actualizado por ADR-010**; inicialmente Grok, `https://api.x.ai/v1`); embeddings locales multilingües `intfloat/multilingual-e5-small` con prefijos `query: `/`passage: ` (**actualizado por ADR-009**; inicialmente `paraphrase-multilingual-MiniLM-L12-v2`); Chroma persistente con coseno; FastAPI como núcleo y Streamlit como UI; desarrollo en Linux.
 - **Motivo:** elección del candidato para el LLM; embeddings gratis/offline y buenos en español; Chroma guarda metadatos para citar; FastAPI y Streamlit son las opciones recomendadas por el caso.
-- **Consecuencias:** requiere `XAI_API_KEY` con saldo; primera ejecución descarga ~490 MB del modelo de embeddings (e5-small).
+- **Consecuencias:** requiere `GEMINI_API_KEY` con créditos; primera ejecución descarga ~490 MB del modelo de embeddings (e5-small).
 
-## ADR-003 — Modelo Grok concreto
-- **Fecha:** _(M0)_ · **Estado:** Pendiente — sin `XAI_API_KEY` al cierre de M0 (2026-10-02); se mantiene el default `grok-3-mini` hasta ejecutar `scripts/check_xai.py`.
-- **Decisión:** _(modelo elegido tras `scripts/check_xai.py`, y por qué: costo/latencia/calidad)_
+## ADR-003 — Modelo LLM concreto
+- **Fecha:** 2026-10-03 · **Estado:** Aceptada
+- **Decisión:** `GEMINI_MODEL=gemini-3.1-flash-lite` (elegido por el autor). `scripts/check_gemini.py` confirmó que está entre los 61 modelos disponibles para la key (`evidencias/M0_check_gemini.txt`).
+- **Tokens de razonamiento (verificación pedida):** con `max_tokens=20` y con `max_tokens=700` la respuesta a "Responde solo: OK" fue `'OK'`, `finish_reason=stop`, `completion_tokens=1`; el endpoint compatible no reporta `reasoning_tokens` (`None`). **No se observó** que el razonamiento consuma `max_tokens` en respuestas cortas, así que no se cambia ninguna configuración.
+- **Pendiente para M6 (propuesta, no decidida):** la prueba usó un prompt trivial. En M6 conviene verificar `finish_reason` con un prompt RAG real y, si aparecen respuestas vacías o cortadas (`length`), evaluar subir `LLM_MAX_TOKENS` o enviar `reasoning_effort` (p. ej. `"low"`/`"none"`) por el endpoint compatible. Cualquier cambio se consulta con el autor.
+- **Historial:** con Grok el default era `grok-3-mini` y nunca se verificó (sin key).
 
 ## ADR-004 — Tamaño de chunk definitivo
 - **Fecha:** 2026-10-02 · **Estado:** Aceptada — **actualizada por ADR-009: `CHUNK_SIZE=800`, `CHUNK_OVERLAP=120`**
@@ -64,9 +67,9 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
 
 ## ADR-007 — Convención de nombres de configuración
 - **Fecha:** 2026-10-02 · **Estado:** Aceptada
-- **Contexto:** los documentos de módulo nombran la configuración como `settings.XAI_MODEL`, `settings.XAI_BASE_URL`, etc., pero en Python la convención para atributos es snake_case minúscula.
-- **Decisión:** los atributos de `Settings` van en **snake_case minúscula** (`settings.xai_api_key`, `settings.chunk_size`, …). Las variables de entorno y `.env.example` se mantienen en **MAYÚSCULAS**; `pydantic-settings` las mapea porque no distingue mayúsculas/minúsculas (`case_sensitive=False`).
-- **Equivalencia:** toda referencia en la documentación del tipo `settings.XAI_MODEL` equivale a `settings.xai_model` (y así para cada variable).
+- **Contexto:** los documentos de módulo nombraban la configuración como `settings.XAI_MODEL`, `settings.XAI_BASE_URL`, etc. (hoy `GEMINI_*`, ADR-010), pero en Python la convención para atributos es snake_case minúscula.
+- **Decisión:** los atributos de `Settings` van en **snake_case minúscula** (`settings.gemini_api_key`, `settings.chunk_size`, …). Las variables de entorno y `.env.example` se mantienen en **MAYÚSCULAS**; `pydantic-settings` las mapea porque no distingue mayúsculas/minúsculas (`case_sensitive=False`).
+- **Equivalencia:** toda referencia en la documentación del tipo `settings.GEMINI_MODEL` equivale a `settings.gemini_model` (y así para cada variable).
 - **Consecuencias:** código idiomático sin cambiar la interfaz de configuración (`.env`) que se documenta al usuario.
 
 ## ADR-008 — Encabezados pegados a su contenido en el chunking
@@ -104,3 +107,14 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
   - El criterio M3-04 se redefine: `embed_query`/`embed_documents` son consistentes con su prefijo respectivo, muy similares (> 0,9) y **distintos** entre sí.
   - Cualquier índice creado con otro modelo debe regenerarse (M4 valida modelo y dimensión de la colección).
   - Descartado el "encabezado de sección en cada chunk" (recall ya 100 %): queda en Mejoras futuras (M11).
+
+## ADR-010 — LLM: Gemini en lugar de Grok
+- **Fecha:** 2026-10-03 · **Estado:** Aceptada (sustituye la elección de LLM de ADR-002)
+- **Contexto:** Grok (xAI) no funcionó para el autor; Gemini sí.
+- **Decisión:** usar **Gemini** a través de su endpoint compatible con OpenAI (`https://generativelanguage.googleapis.com/v1beta/openai/`) con el SDK `openai` ya presente. Variables `GEMINI_API_KEY` (`SecretStr`), `GEMINI_BASE_URL`, `GEMINI_MODEL` (default `gemini-3.1-flash-lite`, elegido por el autor; se confirma en ADR-003). Sin compatibilidad con `XAI_*`.
+- **Alternativas:** SDK oficial `google-genai` (más completo, pero añade dependencia y obliga a reescribir el mapeo de errores de M6, que hoy usa las excepciones del SDK de OpenAI).
+- **Consecuencias:**
+  - `scripts/check_xai.py` → `scripts/check_gemini.py`; `test_xai_connection.py` → `test_gemini_connection.py`; `M6_llm_grok.md` → `M6_llm_gemini.md`.
+  - Nuevos criterios de errores de créditos/autenticación/límite (M6-08…M6-10) y su propagación a CLI (código 2), API (503/429) y UI (`st.warning`) en M7, M8 y M9.
+  - Seguridad reforzada: `tests/unit/test_no_secrets.py`, `scripts/secret_scan.py` y hook `scripts/pre-commit`; la key nunca se imprime (solo `****` + últimos 4).
+  - Gemini 3.x puede consumir `max_tokens` en razonamiento: se verifica en `check_gemini.py` y se documenta en ADR-003.

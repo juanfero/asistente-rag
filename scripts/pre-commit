@@ -1,0 +1,4 @@
+#!/bin/sh
+# Hook de pre-commit: bloquea el commit si los archivos en stage contienen claves de API.
+# Instalación: cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+exec python3 "$(git rev-parse --show-toplevel)/scripts/secret_scan.py" --staged

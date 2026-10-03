@@ -17,10 +17,10 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # LLM: Grok (xAI)
-    xai_api_key: SecretStr | None = None
-    xai_base_url: str = "https://api.x.ai/v1"
-    xai_model: str = "grok-3-mini"
+    # LLM: Gemini vía endpoint compatible con OpenAI (ADR-010)
+    gemini_api_key: SecretStr | None = None
+    gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai/"
+    gemini_model: str = "gemini-3.1-flash-lite"
     llm_temperature: float = Field(default=0.1, ge=0.0, le=2.0)
     llm_max_tokens: int = Field(default=700, ge=1)
 

@@ -1,9 +1,9 @@
 # M0 — Setup y configuración
 
-**Estado:** ✅ Completado (M0-08 ⏸ pendiente: sin API key) · **Estimado:** 2 h · **Depende de:** —
+**Estado:** ✅ Completado (M0-08 ✅ con Gemini, ADR-010) · **Estimado:** 2 h · **Depende de:** —
 
 ## Objetivo
-Dejar un esqueleto de proyecto instalable y testeable: entorno virtual, dependencias fijadas, configuración centralizada por `.env`, logging, pytest/ruff configurados y **conexión a Grok (xAI) verificada** con un modelo válido.
+Dejar un esqueleto de proyecto instalable y testeable: entorno virtual, dependencias fijadas, configuración centralizada por `.env`, logging, pytest/ruff configurados y **conexión al LLM verificada** con un modelo válido (Gemini desde ADR-010; originalmente Grok).
 
 ## Tareas
 1. `git init`, `.gitignore` (Python, `.venv/`, `.env`, `data/chroma/*` excepto `.gitkeep`, `__pycache__`, `.pytest_cache`, `.ruff_cache`).
@@ -14,12 +14,12 @@ Dejar un esqueleto de proyecto instalable y testeable: entorno virtual, dependen
    - PyTorch se instala **CPU-only** antes del paquete (ver ADR-006): `pip install torch --index-url https://download.pytorch.org/whl/cpu`. `requirements.txt` se genera con `pip freeze --exclude-editable` y lleva como primera línea `--extra-index-url https://download.pytorch.org/whl/cpu`.
 3. Config pytest en `pyproject.toml`: `testpaths=["tests"]`, `pythonpath=["src"]`, marcador `integration`.
 4. Config ruff: `line-length=100`, reglas `E,F,I,UP,B`.
-5. `src/rag/config.py`: clase `Settings(BaseSettings)` con (atributos en snake_case minúscula, p. ej. `settings.xai_model`; variables de entorno en MAYÚSCULAS — ver ADR-007):
+5. `src/rag/config.py`: clase `Settings(BaseSettings)` con (atributos en snake_case minúscula, p. ej. `settings.gemini_model`; variables de entorno en MAYÚSCULAS — ver ADR-007):
    | Variable | Default |
    |---|---|
-   | `XAI_API_KEY` | (obligatoria para LLM; `SecretStr`, opcional al cargar) |
-   | `XAI_BASE_URL` | `https://api.x.ai/v1` |
-   | `XAI_MODEL` | `grok-3-mini` (se ajusta tras listar modelos) |
+   | `GEMINI_API_KEY` | (obligatoria para LLM; `SecretStr`, opcional al cargar) — antes `XAI_API_KEY` (ADR-010) |
+   | `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai/` — antes `XAI_BASE_URL` |
+   | `GEMINI_MODEL` | `gemini-3.1-flash-lite` (confirmado con `check_gemini.py`) — antes `XAI_MODEL=grok-3-mini` |
    | `LLM_TEMPERATURE` | `0.1` |
    | `LLM_MAX_TOKENS` | `700` |
    | `EMBEDDING_MODEL` | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` → **`intfloat/multilingual-e5-small` desde M3.1 (ADR-009)**; más `EMBEDDING_QUERY_PREFIX`/`EMBEDDING_PASSAGE_PREFIX` |
@@ -35,11 +35,11 @@ Dejar un esqueleto de proyecto instalable y testeable: entorno virtual, dependen
    Función `get_settings()` con `lru_cache`. Validaciones: `CHUNK_OVERLAP < CHUNK_SIZE`, `TOP_K ≥ 1`, `0 ≤ MIN_SCORE ≤ 1`.
 6. `src/rag/logging_conf.py`: `setup_logging(level)` formato `%(asctime)s %(levelname)s %(name)s - %(message)s`.
 7. `.env.example` con todas las variables (sin la key real).
-8. `scripts/check_xai.py`: lista modelos (`client.models.list()`), imprime los disponibles y hace una llamada mínima ("Responde solo: OK") con `XAI_MODEL`. Con el resultado, fijar `XAI_MODEL` en `.env` y documentarlo en ADR-003.
+8. `scripts/check_gemini.py` (antes `check_xai.py`, ADR-010): lista modelos (`client.models.list()`), imprime los disponibles, confirma `GEMINI_MODEL` y hace una llamada mínima ("Responde solo: OK") revisando texto no vacío y `finish_reason`; la key solo se muestra enmascarada. Con el resultado, fijar `XAI_MODEL` en `.env` y documentarlo en ADR-003.
 9. Crear `docs/BITACORA.md`, `docs/03_DECISIONES.md`, `docs/04_USO_AI_ASSISTED.md` (ya existen como plantilla — completar entrada M0).
 
 ## Archivos
-`pyproject.toml`, `requirements.txt`, `.gitignore`, `.env.example`, `src/rag/__init__.py`, `src/rag/config.py`, `src/rag/logging_conf.py`, `scripts/check_xai.py`, `tests/conftest.py`, `tests/unit/test_config.py`, `tests/integration/test_xai_connection.py`.
+`pyproject.toml`, `requirements.txt`, `.gitignore`, `.env.example`, `src/rag/__init__.py`, `src/rag/config.py`, `src/rag/logging_conf.py`, `scripts/check_gemini.py`, `tests/conftest.py`, `tests/unit/test_config.py`, `tests/integration/test_gemini_connection.py` (antes `test_xai_connection.py`).
 
 ## Criterios de aceptación
 | ID | Criterio | Test |
@@ -51,7 +51,7 @@ Dejar un esqueleto de proyecto instalable y testeable: entorno virtual, dependen
 | M0-05 | `MIN_SCORE` fuera de [0,1] o `TOP_K < 1` lanza error | `test_invalid_ranges` |
 | M0-06 | La API key no aparece en `repr(settings)` ni en logs | `test_secret_not_exposed` |
 | M0-07 | `pytest -m "not integration"` y `ruff` corren limpios | CI local |
-| M0-08 *(integration)* | Con `XAI_API_KEY` válida, `models.list()` devuelve ≥1 modelo y `XAI_MODEL` está entre ellos; una completion devuelve texto no vacío | `test_xai_connection` (skip si no hay key) |
+| M0-08 *(integration)* | Con `GEMINI_API_KEY` válida, `models.list()` devuelve ≥1 modelo y `GEMINI_MODEL` está entre ellos; una completion devuelve texto no vacío | `test_gemini_connection` (skip si no hay key) |
 
 ## Verificación
 ```bash
@@ -60,7 +60,7 @@ pip install -U pip
 pip install torch --index-url https://download.pytorch.org/whl/cpu
 pip install -e ".[dev]"
 pytest -m "not integration" -q
-python scripts/check_xai.py
+python scripts/check_gemini.py
 pytest -m integration -q
 ruff check src tests && ruff format --check src tests
 ```
@@ -79,8 +79,12 @@ ruff check src tests && ruff format --check src tests
 | 2026-10-02 | `pytest -m integration -v -rs` | 1 skipped | "Sin XAI_API_KEY: se omite la prueba de conexión con xAI" |
 | 2026-10-02 | `ruff check src tests scripts && ruff format --check src tests scripts` | All checks passed! / 7 files already formatted | |
 | 2026-10-02 | `python scripts/check_xai.py` (sin key) | exit 1, sin traceback | "ERROR: falta XAI_API_KEY. Defínela en el archivo .env (ver .env.example)…" |
+| 2026-10-03 | **ADR-010** Cambio de LLM Grok → Gemini (endpoint compatible con OpenAI) | OK | `GEMINI_*` en config y `.env.example`; `check_gemini.py`, `test_gemini_connection.py` |
+| 2026-10-03 | `python scripts/check_gemini.py` (key en `.env`, enmascarada) | exit 0 | 61 modelos; `gemini-3.1-flash-lite` disponible; respuesta `'OK'`, `finish_reason=stop` con 20 y 700 tokens (`evidencias/M0_check_gemini.txt`) |
+| 2026-10-03 | `pytest -m integration -v -rs` | 6 passed | `test_gemini_connection` en verde → **M0-08 cerrado** |
+| 2026-10-03 | Seguridad: `test_no_secrets.py`, `secret_scan.py`, hook `pre-commit` instalado | OK | `git check-ignore .env` ✔; historial `AIza\|AQ\.`: vacío |
 
-**Estado de criterios:** M0-01 ✅ · M0-02 ✅ · M0-03 ✅ · M0-04 ✅ · M0-05 ✅ · M0-06 ✅ · M0-07 ✅ · M0-08 ⏸ **PENDIENTE: sin API key** (el test hace skip limpio; no bloquea M1, acordado con el autor).
+**Estado de criterios:** M0-01 ✅ · M0-02 ✅ · M0-03 ✅ · M0-04 ✅ · M0-05 ✅ · M0-06 ✅ · M0-07 ✅ · M0-08 ✅ (cerrado el 2026-10-03 con Gemini; estuvo ⏸ sin API key desde el 2026-10-02).
 
 **Notas:**
 - Fallo inicial de M0-06: `setup_logging()` usa `logging.basicConfig(force=True)`, que elimina el handler de `caplog`. El test ahora verifica por separado los registros capturados (`caplog`) y la salida real formateada por el handler del proyecto (`capsys`).
@@ -88,4 +92,4 @@ ruff check src tests && ruff format --check src tests
 - Pruebas extra: `test_setup_logging` (aprobada por el autor) y, como complemento de M0-02/03/05, `test_env_file_is_read`, `test_get_settings_is_cached`, `test_valid_range_limits`.
 - **Riesgo anotado (H9, se resuelve en M8):** `POST /documents` guarda los archivos subidos en `data/docs/`, que está versionado como corpus; las subidas de prueba podrían terminar en git.
 
-**Modelo Grok fijado:** _pendiente (sin API key); default `grok-3-mini` hasta ejecutar `scripts/check_xai.py` — ADR-003_ · **Versión de Python:** 3.10.12 (venv `.venv`)
+**Modelo LLM fijado:** `gemini-3.1-flash-lite` (ADR-003, ADR-010). Antes: `grok-3-mini`, nunca verificado · **Versión de Python:** 3.10.12 (venv `.venv`)

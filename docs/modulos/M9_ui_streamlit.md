@@ -22,6 +22,7 @@ Interfaz sencilla para la demo y el video: cargar documentos, ver qué está ind
 | M9-02 | La app renderiza sin excepciones con la API mockeada (`streamlit.testing.v1.AppTest`) | `test_app_renders` |
 | M9-03 | Al enviar una pregunta (AppTest) se muestra la respuesta y el expander de fuentes | `test_app_ask_flow` |
 | M9-04 | Con la API caída se muestra el aviso y no hay traceback | `test_app_api_down` |
+| M9-06 | Errores del LLM (créditos agotados, key inválida, límite por minuto) se muestran con `st.warning` y el mensaje en español, sin traceback (ADR-010) | `test_app_llm_errors` |
 | M9-05 *(manual)* | Flujo completo en navegador: subir un documento nuevo → preguntar sobre él → ver fuente | captura en `evidencias/M9_*.png` |
 
 ## Verificación
