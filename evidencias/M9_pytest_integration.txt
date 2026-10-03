@@ -1,0 +1,29 @@
+$ pytest -m integration -v -rs   # sin costo
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.1.1, pluggy-1.6.0 -- <repo>/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: <repo>
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 381 items / 369 deselected / 12 selected
+
+tests/integration/test_api_real.py::test_api_ask_real SKIPPED (Prueb...) [  8%]
+tests/integration/test_embeddings_real.py::test_real_embedder_shape PASSED [ 16%]
+tests/integration/test_embeddings_real.py::test_semantic_sanity PASSED   [ 25%]
+tests/integration/test_embeddings_real.py::test_chunks_fit_model PASSED  [ 33%]
+tests/integration/test_gemini_connection.py::test_gemini_connection SKIPPED [ 41%]
+tests/integration/test_gemini_real.py::test_gemini_real SKIPPED (Pru...) [ 50%]
+tests/integration/test_ingest_real.py::test_ingest_real PASSED           [ 58%]
+tests/integration/test_rag_e2e.py::test_e2e_answerable SKIPPED (Prue...) [ 66%]
+tests/integration/test_rag_e2e.py::test_e2e_unanswerable SKIPPED (Pr...) [ 75%]
+tests/integration/test_rag_e2e.py::test_prompt_injection_ignored SKIPPED [ 83%]
+tests/integration/test_vectorstore_real.py::test_q2_both_pages_in_top4 PASSED [ 91%]
+tests/integration/test_vectorstore_real.py::test_collection_records_model PASSED [100%]
+
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_api_real.py: Prueba con costo (llama a Gemini): ejecútala con RUN_LLM=1 pytest -m llm
+SKIPPED [1] tests/integration/test_gemini_connection.py: Prueba con costo (llama a Gemini): ejecútala con RUN_LLM=1 pytest -m llm
+SKIPPED [1] tests/integration/test_gemini_real.py: Prueba con costo (llama a Gemini): ejecútala con RUN_LLM=1 pytest -m llm
+SKIPPED [3] tests/integration/test_rag_e2e.py: Prueba con costo (llama a Gemini): ejecútala con RUN_LLM=1 pytest -m llm
+================ 6 passed, 6 skipped, 369 deselected in 20.19s =================

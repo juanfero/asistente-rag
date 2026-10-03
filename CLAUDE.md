@@ -34,5 +34,6 @@ ruff check src tests && ruff format --check src tests
 python -m rag.cli ingest data/docs      # desde M5
 python -m rag.cli ask "pregunta"        # desde M7
 uvicorn rag.api:app --workers 1         # desde M8 (1 worker: Chroma local) → /docs
-streamlit run src/rag/ui_streamlit.py   # desde M9
+streamlit run src/rag/ui_streamlit.py   # desde M9 (lee API_URL)
+scripts/run_demo.sh                     # API + UI; Ctrl+C detiene ambas (UI_PORT=8502 si 8501 está ocupado)
 ```

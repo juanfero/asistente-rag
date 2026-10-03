@@ -3,7 +3,7 @@
 Asistente en Python que responde preguntas **usando únicamente la información de documentos internos** (txt, md y pdf), **cita el documento y el fragmento** de cada afirmación y **responde explícitamente que no encontró la información** cuando los documentos no la contienen.
 
 > Prueba técnica *AI Developer Engineer Junior* — I Cloud Seven (IC7) · Autor: Juan Felipe Rojas
-> Estado: módulos M0–M8 completos (núcleo RAG, CLI y API). Pendientes: UI Streamlit (M9), evaluación formal (M10), entrega y video (M11). Ver [Estado del proyecto](#16-estado-del-proyecto).
+> Estado: módulos M0–M9 completos (núcleo RAG, CLI, API y UI Streamlit). Pendientes: evaluación formal (M10), entrega y video (M11). Ver [Estado del proyecto](#16-estado-del-proyecto).
 
 ---
 
@@ -41,7 +41,7 @@ Un cliente necesita consultar sus documentos internos sin que el asistente inven
 6. **Genera** la respuesta con **Gemini** (`gemini-3.1-flash-lite`) usando un prompt que obliga a responder solo con el contexto, a citar `[n]` y a decir *"No encontré información sobre eso en los documentos cargados."* cuando no hay respuesta.
 7. **Devuelve** la respuesta con sus fuentes: documento, página, fragmento, score y si fue citado.
 
-Se usa desde **consola (CLI)** o mediante una **API REST (FastAPI)** con documentación Swagger. La interfaz Streamlit se agrega en M9.
+Se usa desde **consola (CLI)**, mediante una **API REST (FastAPI)** con documentación Swagger, o desde una **interfaz web (Streamlit)** que consume la API.
 
 **Corpus de ejemplo** (empresa ficticia *Nexa Logística S.A.S.*, en `data/docs/`):
 
@@ -88,7 +88,7 @@ Fuentes:
                 │       rag_engine.py: citas [n] → fuentes, grounded sí/no        │
                 └─────────────────────────────────────────────────────────────────┘
 
- Interfaces:   cli.py (consola)  ·  api.py (FastAPI + Swagger)  ·  ui_streamlit.py (M9)
+ Interfaces:   cli.py (consola)  ·  api.py (FastAPI + Swagger)  ◄── ui_streamlit.py (Streamlit, vía api_client.py)
 ```
 
 **Flujo de una pregunta, paso a paso** (`src/rag/rag_engine.py`):
@@ -111,6 +111,7 @@ Fuentes:
 | `llm.py` | Cliente Gemini, errores (créditos, key, límite) y `FakeLLM` |
 | `prompts.py` / `rag_engine.py` | Prompt *grounded* y motor RAG con citas |
 | `cli.py` / `api.py` | Interfaces de consola y REST |
+| `api_client.py` / `ui_streamlit.py` | Cliente HTTP con timeouts y la interfaz web (no importa el motor: separación cliente/servidor) |
 
 ---
 
@@ -124,7 +125,7 @@ Fuentes:
 | LLM | Gemini `gemini-3.1-flash-lite` vía endpoint compatible con OpenAI (SDK `openai`) | Cliente simple y estándar ([ADR-010](docs/03_DECISIONES.md)) |
 | PDF | `pypdf` | Extrae texto por página (permite citar la página) |
 | API | FastAPI + Uvicorn | Recomendado por el caso; Swagger automático |
-| UI | Streamlit (M9) | Recomendado por el caso; consume la API |
+| UI | Streamlit | Recomendado por el caso; consume la API |
 | Configuración | `pydantic-settings` + `.env` | Tipada y centralizada |
 | Pruebas / calidad | `pytest`, `ruff` | Pruebas sin red por defecto; lint y formato |
 
@@ -222,9 +223,29 @@ uvicorn rag.api:app --workers 1     # http://localhost:8000  ·  Swagger: http:/
 
 Se usa **un solo worker** porque ChromaDB local no admite escritores concurrentes entre procesos; dentro del proceso, ingesta y borrados se serializan con un lock. Al arrancar se carga el modelo de embeddings y se "calienta" para que la primera pregunta no pague la carga; Gemini solo se instancia cuando hace falta.
 
-### 6.3 Interfaz Streamlit
+### 6.3 Interfaz web (Streamlit) y demo completa
 
-Pendiente (M9): `streamlit run src/rag/ui_streamlit.py`, consumiendo la API.
+La forma más simple de levantar todo (API + UI) es el script de demo:
+
+```bash
+scripts/run_demo.sh                  # API en el puerto de API_URL + UI en http://localhost:8501
+UI_PORT=8502 scripts/run_demo.sh     # si el puerto 8501 está ocupado
+```
+
+El script guarda los PID de ambos procesos y los detiene al presionar **Ctrl+C**. Antes de arrancar verifica que los puertos estén libres: si `API_URL` apunta a un puerto ocupado por otro servicio, indica cómo cambiarlo (p. ej. `API_URL=http://localhost:8011` en `.env`).
+
+También se pueden levantar por separado:
+
+```bash
+uvicorn rag.api:app --workers 1 --port 8000      # terminal 1
+streamlit run src/rag/ui_streamlit.py            # terminal 2 (lee API_URL)
+```
+
+Qué ofrece la interfaz:
+- **Barra lateral:** estado de la API y del modelo, `top_k`, lista de documentos (🔒 corpus protegido · 📄 subidas con botón 🗑️), carga de archivos con un mensaje por archivo, **Re-indexar todo** y el interruptor **Mostrar contexto recuperado (depuración)**.
+- **Chat:** tres preguntas de ejemplo (contestable, parcial y sin respuesta), historial con **Limpiar conversación**, badge verde *Basada en documentos* o gris *Sin información en los documentos*, expander **Fuentes citadas** (solo si la respuesta está basada en documentos), modelo y latencia.
+- **Errores claros sin traceback:** créditos agotados o key inválida (rojo), límite por minuto (amarillo), índice vacío (con botón **Indexar documentos**), índice de otro modelo (instrucción de reset) y API caída (con el comando para levantarla).
+- La UI solo lee `API_URL`: nunca lee ni muestra la API key.
 
 ---
 
@@ -299,6 +320,8 @@ curl -X POST http://localhost:8000/ask -H "Content-Type: application/json" \
 | DELETE | `/documents/{source}` | Quita un documento del índice; `?delete_file=true` borra el archivo (solo subidas) |
 | POST | `/ask` | `{"question": "...", "top_k": 4}` → respuesta, `grounded`, fuentes y contexto |
 
+En `/ask`, `sources` contiene los fragmentos citados; si la respuesta es *"No encontré…"* (`grounded: false`), `sources` es una lista vacía y `context` conserva lo recuperado (útil para depurar).
+
 **Formato único de error:** `{"error": "<CODIGO>", "detail": "<mensaje en español>"}`
 
 | HTTP | `error` | Cuándo |
@@ -329,7 +352,7 @@ ruff check src tests && ruff format --check src tests
 
 | Suite | Resultado actual |
 |---|---|
-| Unitarias (`not integration`) | 337 pasan |
+| Unitarias (`not integration`) | 369 pasan (incluye la UI con `AppTest` y la API simulada) |
 | Integración sin costo | 6 pasan (las 6 `llm` se omiten salvo `RUN_LLM=1`) |
 | Con Gemini (`RUN_LLM=1 -m llm`) | 6 pasan: conexión, respuesta, extremo a extremo, API real y **prompt injection** |
 
@@ -413,7 +436,7 @@ Se usó **Claude Code** como asistente de desarrollo, módulo por módulo, contr
 | M6 Cliente LLM Gemini | ✅ |
 | M7 Motor RAG | ✅ |
 | M8 API FastAPI | ✅ |
-| M9 UI Streamlit | ⬜ |
+| M9 UI Streamlit | ✅ (capturas de la demo pendientes) |
 | M10 Evaluación con preguntas de prueba | ⬜ |
 | M11 Documentación final, evidencias y video | ⬜ |
 
