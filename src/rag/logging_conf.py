@@ -5,7 +5,15 @@ import logging
 LOG_FORMAT = "%(asctime)s %(levelname)s %(name)s - %(message)s"
 
 # Librerías que registran cada petición HTTP o detalle de carga en INFO (ruido en la CLI)
-NOISY_LOGGERS = ("httpx", "httpcore", "huggingface_hub", "sentence_transformers", "urllib3")
+NOISY_LOGGERS = (
+    "httpx",
+    "httpx2",
+    "httpcore",
+    "openai",
+    "huggingface_hub",
+    "sentence_transformers",
+    "urllib3",
+)
 
 
 def setup_logging(level: str | int = "INFO") -> None:

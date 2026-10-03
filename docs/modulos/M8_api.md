@@ -20,7 +20,7 @@ Exponer ingesta y consultas como API REST documentada (Swagger en `/docs`), reut
 - Dependencias pesadas (embedder, Chroma, LLM) se crean en `lifespan` una sola vez.
 - Esquemas Pydantic de request/response en `src/rag/schemas.py`.
 - Validaciones: extensión permitida, tamaño máx. 10 MB por archivo, nombre saneado (`Path(name).name`, sin `..`).
-- Errores: 400 validación, 413 archivo grande, 415 tipo no soportado, 502 `LLMError` genérico con mensaje claro; `LLMQuotaExhaustedError` → **503** `{"error":"LLM_QUOTA_EXHAUSTED","detail":<mensaje>}`, `LLMAuthError` → **503** `"LLM_AUTH_ERROR"`, `LLMRateLimitError` → **429** (ADR-010), 404 documento inexistente.
+- Errores: `EmptyIndexError` (índice vacío, M7) → código HTTP específico a definir en M8; 400 validación, 413 archivo grande, 415 tipo no soportado, 502 `LLMError` genérico con mensaje claro; `LLMQuotaExhaustedError` → **503** `{"error":"LLM_QUOTA_EXHAUSTED","detail":<mensaje>}`, `LLMAuthError` → **503** `"LLM_AUTH_ERROR"`, `LLMRateLimitError` → **429** (ADR-010), 404 documento inexistente.
 - CORS habilitado para `localhost:8501` (Streamlit).
 
 ## Criterios de aceptación (TestClient + FakeEmbedder + FakeLLM + `tmp_path`)

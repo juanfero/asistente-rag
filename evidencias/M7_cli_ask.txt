@@ -1,0 +1,129 @@
+# MIN_SCORE=0.805 (calibrado, ADR-005) pasado como variable de entorno: el .env local aún tenía 0.80
+
+$ MIN_SCORE=0.805 python -m rag.cli ask ¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales? --show-context
+2026-10-03 14:56:37,655 INFO rag.embeddings - Modelo de embeddings 'intfloat/multilingual-e5-small' cargado en 4.4 s
+2026-10-03 14:56:47,957 INFO rag.llm - LLM gemini-3.1-flash-lite: 10.26 s, tokens 1058/35, finish_reason=stop
+Respuesta:
+El tope diario de alimentación para viajes nacionales es de COP 120.000 [1] y para viajes internacionales es de USD 90 [2].
+
+✔ Basada en documentos
+Fuentes:
+  [1] manual_reembolso_gastos.pdf, pág. 1 · score 0.867 · citada
+  [2] manual_reembolso_gastos.pdf, pág. 2 · score 0.863 · citada
+(modelo gemini-3.1-flash-lite · 10.30 s · recuperados 4, sobre MIN_SCORE=0.805: 4)
+
+Contexto enviado al LLM:
+<documentos>
+[1] (fuente: manual_reembolso_gastos.pdf, pág. 1)
+colaborador.
+- Todos los soportes deben ser factura electrónica a nombre de Nexa Logística S.A.S., NIT 900.123.456-7.
+No se aceptan recibos de caja menor ni cuentas de cobro sin factura.
+3. Topes diarios de viáticos nacionales
+- Alimentación: COP 120.000 por día.
+- Transporte local: COP 80.000 por día.
+- Hospedaje: máximo COP 350.000 por noche.
+- Hospedaje en Bogotá y Medellín: máximo COP 420.000 por noche.
+Los valores que superen estos topes son asumidos por el colaborador, salvo autorización previa y escrita del
+gerente de área.
+
+[2] (fuente: manual_reembolso_gastos.pdf, pág. 2)
+4. Viajes internacionales
+- Para viajes internacionales el tope de alimentación es de USD 90 por día.
+- El hospedaje internacional se reserva a través del área Administrativa según las tarifas del convenio
+vigente.
+5. Anticipos
+Se pueden solicitar anticipos por un máximo del 70% del presupuesto total del viaje. El anticipo se legaliza
+junto con el resto de gastos en el formato FR-021.
+6. Aprobaciones
+- Gastos hasta COP 2.000.000: aprueba el jefe inmediato.
+- Gastos por encima de COP 2.000.000: aprueba el gerente de área.
+7. Pago del reembolso
+Una vez aprobada la legalización, el reembolso se paga en la siguiente quincena mediante transferencia a la
+cuenta de nómina del colaborador.
+8. Gastos no reembolsables
+- Bebidas alcohólicas.
+- Multas de tránsito.
+- Consumos de minibar.
+
+[3] (fuente: politica_vacaciones_y_permisos.md)
+# Política de Vacaciones y Permisos
+
+**Nexa Logística S.A.S.** · Gestión Humana
+**Versión:** 2.1 · **Vigente desde:** 2026-01-15 · **Código:** GH-POL-004
+
+> Documento ficticio para prueba técnica.
+
+## 1. Objetivo y alcance
+
+Esta política establece las reglas para el disfrute de vacaciones, permisos remunerados y licencias de todos los colaboradores con contrato a término indefinido o fijo de Nexa Logística S.A.S. Reemplaza la versión 2.0 y aplica en todas las sedes y centros de distribución.
+
+## 2. Vacaciones
+
+### 2.1 Días de vacaciones
+
+Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada año trabajado.
+
+[4] (fuente: politica_vacaciones_y_permisos.md)
+- **Licencia de maternidad:** 18 semanas, según la ley colombiana.
+
+Las licencias se tramitan con Gestión Humana presentando el registro civil de nacimiento o la certificación médica correspondiente.
+
+## 5. Día de cumpleaños
+
+Todo colaborador tiene derecho a **un día libre por su cumpleaños**. Este día **debe tomarse dentro del mes del cumpleaños**; si no se toma en ese mes, se pierde y no es acumulable.
+
+## 6. Disposiciones finales
+
+Cualquier situación no contemplada en esta política será revisada por Gestión Humana. Las consultas sobre esta política se atienden en el portal NexaPeople, opción "Consultas a Gestión Humana".
+</documentos>
+
+Pregunta: ¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?
+exit=0
+
+==================================================================
+
+$ MIN_SCORE=0.805 python -m rag.cli ask ¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?
+2026-10-03 14:56:58,481 INFO rag.embeddings - Modelo de embeddings 'intfloat/multilingual-e5-small' cargado en 5.1 s
+2026-10-03 14:57:00,465 INFO rag.llm - LLM gemini-3.1-flash-lite: 1.94 s, tokens 904/26, finish_reason=stop
+Respuesta:
+Por matrimonio se conceden 5 días hábiles [1]. Los documentos no incluyen información sobre cómo se pagan las horas extra.
+
+✔ Basada en documentos
+Fuentes:
+  [1] politica_vacaciones_y_permisos.md · score 0.883 · citada
+(modelo gemini-3.1-flash-lite · 1.98 s · recuperados 4, sobre MIN_SCORE=0.805: 4)
+exit=0
+
+==================================================================
+
+$ MIN_SCORE=0.805 python -m rag.cli ask ¿Cuántos días a la semana puedo trabajar remoto?
+2026-10-03 14:57:11,452 INFO rag.embeddings - Modelo de embeddings 'intfloat/multilingual-e5-small' cargado en 5.0 s
+2026-10-03 14:57:22,246 INFO rag.llm - LLM gemini-3.1-flash-lite: 10.75 s, tokens 864/12, finish_reason=stop
+Respuesta:
+No encontré información sobre eso en los documentos cargados.
+
+✘ Sin información en los documentos
+Fuentes:
+  [1] politica_vacaciones_y_permisos.md · score 0.871 · no citada
+  [2] politica_vacaciones_y_permisos.md · score 0.863 · no citada
+  [3] politica_vacaciones_y_permisos.md · score 0.863 · no citada
+  [4] politica_vacaciones_y_permisos.md · score 0.857 · no citada
+(modelo gemini-3.1-flash-lite · 10.79 s · recuperados 4, sobre MIN_SCORE=0.805: 4)
+exit=0
+
+==================================================================
+
+$ MIN_SCORE=0.805 python -m rag.cli ask ¿Cuál es la capital de Francia? --show-context
+2026-10-03 14:57:32,718 INFO rag.embeddings - Modelo de embeddings 'intfloat/multilingual-e5-small' cargado en 4.5 s
+Respuesta:
+No encontré información sobre eso en los documentos cargados.
+
+✘ Sin información en los documentos
+(sin llamada al LLM · 0.04 s · recuperados 4, sobre MIN_SCORE=0.805: 0)
+
+Contexto enviado al LLM:
+  (ninguno: ningún fragmento supera MIN_SCORE=0.805; no se llamó al LLM)
+exit=0
+
+==================================================================
+

@@ -38,7 +38,7 @@ def test_defaults() -> None:
     assert s.chunk_size == 800  # ADR-004/ADR-009
     assert s.chunk_overlap == 120  # ADR-004/ADR-009
     assert s.top_k == 4
-    assert s.min_score == 0.80  # provisional, se calibra en M7 (ADR-005)
+    assert s.min_score == 0.805  # calibrado en M7 (ADR-005)
     assert s.api_url == "http://localhost:8000"
     assert s.log_level == "INFO"
 
@@ -138,7 +138,7 @@ def test_setup_logging() -> None:
     setup_logging("DEBUG")
     assert logging.getLogger().level == logging.DEBUG
     # Las librerías ruidosas (peticiones HTTP de Hugging Face, etc.) quedan en WARNING
-    for name in ("httpx", "huggingface_hub", "sentence_transformers"):
+    for name in ("httpx", "httpx2", "openai", "huggingface_hub", "sentence_transformers"):
         assert logging.getLogger(name).level == logging.WARNING
 
 

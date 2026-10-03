@@ -55,7 +55,36 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
 - **Consecuencias (de la decisión inicial):** 22 chunks en el corpus. Solo 1 chunk (136 tokens) se trunca y lo perdido (8 tokens) está al inicio del chunk siguiente gracias al solapamiento. Se mantiene el modelo (sin cambio de stack). `test_chunks_fit_model` (integración) protege la regla si cambian el corpus o el tamaño.
 
 ## ADR-005 — Umbral de relevancia (MIN_SCORE) y top_k
-- **Fecha:** _(M7)_ · **Estado:** Pendiente
+- **Fecha:** 2026-10-03 · **Estado:** Aceptada — **`MIN_SCORE=0.805`, `TOP_K=4`**
+- **Calibración (M7, regla del autor):** `MIN_SCORE = min(top-1 de legítimas + paráfrasis) − 0,03`, medido con `scripts/calibrar_umbral.py` sobre el índice real (e5-small 800/120). Q7–Q9 (en dominio sin respuesta) no se usan: las rechaza el LLM.
+
+| Grupo | Id | Pregunta | top-1 |
+|---|---|---|---|
+| a) Legítimas | Q1 | ¿Cuántos días de vacaciones tengo por año trabajado y con cuánta anticipación…? | 0.900 |
+| a) Legítimas | Q2 | ¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales? | 0.867 |
+| a) Legítimas | Q3 | ¿Qué requisitos debe cumplir mi contraseña corporativa? | 0.885 |
+| a) Legítimas | Q4 | ¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra? | 0.883 |
+| a) Legítimas | Q5 | ¿Qué VPN debo usar y me prestan un celular corporativo? | 0.884 |
+| a) Legítimas | Q6 | ¿Cuál es el tope de hospedaje en Medellín y cuánto reconocen por kilómetro…? | 0.870 |
+| b) Paráfrasis | P1 | ¿Cuánto tiempo de descanso me corresponde al año? | 0.880 |
+| b) Paráfrasis | P2 | ¿Cuánta plata me reconocen para comida cuando viajo dentro del país? | 0.841 |
+| b) Paráfrasis | P3 | ¿Cada cuánto tengo que cambiar la clave del computador? | 0.857 |
+| b) Paráfrasis | P4 | ¿Qué programa uso para conectarme desde la casa? | **0.835** |
+| c) Fuera de dominio | F1 | ¿Cuál es la capital de Francia? | 0.751 |
+| c) Fuera de dominio | F2 | Dame una receta de arepas | **0.822** |
+| c) Fuera de dominio | F3 | ¿Quién ganó el último mundial de fútbol? | 0.749 |
+| c) Fuera de dominio | F4 | Explícame la teoría de la relatividad | 0.797 |
+
+| Grupo | mín top-1 | máx top-1 |
+|---|---|---|
+| a) Legítimas | 0.867 | 0.900 |
+| b) Paráfrasis legítimas | 0.835 | 0.880 |
+| c) Fuera de dominio | 0.749 | 0.822 |
+
+`MIN_SCORE = min(a+b) − 0,03 = 0,835 − 0,03 = **0,805**`. `max(c) = 0,822` > 0,805 → **no separa del todo**: filtra 3 de 4 preguntas fuera de dominio (F1, F3, F4) pero no F2 ("receta de arepas", 0,822), que llega al LLM y este debe rechazarla.
+
+- **Consecuencias:** el umbral corta la mayoría de las preguntas fuera de dominio **sin llamar a Gemini** (ahorra costo y latencia) y no pierde ninguna legítima medida; "receta de arepas" (0,822) pasa el filtro y la abstención depende del prompt. `TOP_K=4` basta para que Q2 traiga ambas páginas del PDF (puestos 1 y 2).
+- **Historial:** provisional 0,35 (MiniLM, M0) → 0,80 (e5, M3.1) → criterio "(mín top-1 Q1–Q6) − 0,05" descartado en M7 por no medir paráfrasis ni fuera de dominio.
 - **Criterio acordado (M3.1):** el margen medido es negativo con todos los modelos (ADR-009), así que `MIN_SCORE` **no** separa contestable de no contestable. Se calibrará como **filtro de ruido**: `MIN_SCORE = (mínimo top-1 de Q1–Q6) − 0.05`; la abstención la decide el LLM con el prompt. Valor provisional: `0.80`.
 
 ## ADR-006 — PyTorch CPU-only

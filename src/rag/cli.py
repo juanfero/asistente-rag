@@ -1,4 +1,4 @@
-"""Interfaz de consola: `python -m rag.cli {ingest,stats,reset}`."""
+"""Interfaz de consola: `python -m rag.cli {ingest,stats,reset,ask}`."""
 
 import argparse
 import sys
@@ -8,11 +8,14 @@ from pathlib import Path
 from rag.config import Settings, get_settings
 from rag.embeddings import Embedder
 from rag.ingest import IngestReport, build_store, ingest_paths
+from rag.llm import LLMClient, LLMError, LLMResult, get_llm
 from rag.logging_conf import setup_logging
+from rag.rag_engine import RAGAnswer, RAGEngine
 from rag.vectorstore import ChromaVectorStore, EmbeddingModelMismatchError, reset_collection
 
 EXIT_OK = 0
-EXIT_ERROR = 1
+EXIT_ERROR = 1  # entrada inválida, índice vacío o de otro modelo
+EXIT_LLM_ERROR = 2  # créditos agotados, key inválida, límite, etc. (ADR-010)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -28,7 +31,70 @@ def _parser() -> argparse.ArgumentParser:
 
     reset = sub.add_parser("reset", help="vacía el índice")
     reset.add_argument("--yes", action="store_true", help="no pedir confirmación")
+
+    ask = sub.add_parser("ask", help="pregunta sobre los documentos indexados")
+    ask.add_argument("question", help="pregunta en lenguaje natural")
+    ask.add_argument("--top-k", type=int, default=None, help="fragmentos a recuperar")
+    ask.add_argument("--show-context", action="store_true", help="muestra el contexto usado")
     return parser
+
+
+class _LazyLLM:
+    """Crea el cliente LLM solo si se necesita (las preguntas cortadas por el umbral no lo usan)."""
+
+    def __init__(self, factory: Callable[[], LLMClient]) -> None:
+        self._factory = factory
+        self._client: LLMClient | None = None
+
+    def generate(self, system: str, user: str) -> LLMResult:
+        if self._client is None:
+            self._client = self._factory()
+        return self._client.generate(system, user)
+
+
+def _print_answer(answer: RAGAnswer, settings: Settings, show_context: bool) -> None:
+    """Imprime respuesta, estado, fuentes y (opcional) el contexto enviado al LLM."""
+    print("Respuesta:")
+    print(answer.answer)
+    print()
+    print("✔ Basada en documentos" if answer.grounded else "✘ Sin información en los documentos")
+    if answer.sources:
+        print("Fuentes:")
+        for ref in answer.sources:
+            page = f", pág. {ref.page}" if ref.page is not None else ""
+            mark = "citada" if ref.cited else "no citada"
+            print(f"  [{ref.index}] {ref.source}{page} · score {ref.score:.3f} · {mark}")
+    llm = f"modelo {answer.model}" if answer.llm_called else "sin llamada al LLM"
+    print(
+        f"({llm} · {answer.latency_s:.2f} s · recuperados {answer.retrieved}, "
+        f"sobre MIN_SCORE={settings.min_score}: {len(answer.context)})"
+    )
+    if show_context:
+        print("\nContexto enviado al LLM:")
+        if answer.prompt is None:
+            print(
+                f"  (ninguno: ningún fragmento supera MIN_SCORE={settings.min_score}; "
+                "no se llamó al LLM)"
+            )
+        else:
+            print(answer.prompt)
+
+
+def _run_ask(
+    args: argparse.Namespace, store: ChromaVectorStore, settings: Settings, llm: LLMClient | None
+) -> int:
+    """Ejecuta `ask` y traduce los errores a códigos de salida (0/1/2) sin traceback."""
+    engine = RAGEngine(store, llm or _LazyLLM(lambda: get_llm(settings)), settings)
+    try:
+        answer = engine.ask(args.question, top_k=args.top_k)
+    except LLMError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return EXIT_LLM_ERROR
+    except ValueError as exc:  # pregunta inválida o EmptyIndexError
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+    _print_answer(answer, settings, args.show_context)
+    return EXIT_OK
 
 
 def _print_report(report: IngestReport) -> None:
@@ -88,6 +154,7 @@ def main(
     settings: Settings | None = None,
     embedder: Embedder | None = None,
     confirm: Callable[[str], str] = input,
+    llm: LLMClient | None = None,
 ) -> int:
     """Ejecuta la CLI y devuelve el código de salida (dependencias inyectables para pruebas)."""
     args = _parser().parse_args(argv)
@@ -115,6 +182,9 @@ def main(
     if args.command == "stats":
         _print_stats(store)
         return EXIT_OK
+
+    if args.command == "ask":
+        return _run_ask(args, store, settings, llm)
 
     try:
         report = ingest_paths(args.paths, store, settings, recursive=args.recursive)

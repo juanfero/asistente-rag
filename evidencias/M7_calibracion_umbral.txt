@@ -1,0 +1,28 @@
+$ python scripts/calibrar_umbral.py
+| Grupo | Id | Pregunta | top-1 | Fuente top-1 |
+|---|---|---|---|---|
+| a) Legítimas | Q1 | ¿Cuántos días de vacaciones tengo por año trabajado y con cuánta anticipación debo solicitarlas? | 0.900 | politica_vacaciones_y_permisos.md |
+| a) Legítimas | Q2 | ¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales? | 0.867 | manual_reembolso_gastos.pdf |
+| a) Legítimas | Q3 | ¿Qué requisitos debe cumplir mi contraseña corporativa? | 0.885 | guia_onboarding_ti.txt |
+| a) Legítimas | Q4 | ¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra? | 0.883 | politica_vacaciones_y_permisos.md |
+| a) Legítimas | Q5 | ¿Qué VPN debo usar y me prestan un celular corporativo? | 0.884 | guia_onboarding_ti.txt |
+| a) Legítimas | Q6 | ¿Cuál es el tope de hospedaje en Medellín y cuánto reconocen por kilómetro con vehículo propio? | 0.870 | manual_reembolso_gastos.pdf |
+| b) Paráfrasis legítimas | P1 | ¿Cuánto tiempo de descanso me corresponde al año? | 0.880 | politica_vacaciones_y_permisos.md |
+| b) Paráfrasis legítimas | P2 | ¿Cuánta plata me reconocen para comida cuando viajo dentro del país? | 0.841 | manual_reembolso_gastos.pdf |
+| b) Paráfrasis legítimas | P3 | ¿Cada cuánto tengo que cambiar la clave del computador? | 0.857 | guia_onboarding_ti.txt |
+| b) Paráfrasis legítimas | P4 | ¿Qué programa uso para conectarme desde la casa? | 0.835 | guia_onboarding_ti.txt |
+| c) Fuera de dominio | F1 | ¿Cuál es la capital de Francia? | 0.751 | manual_reembolso_gastos.pdf |
+| c) Fuera de dominio | F2 | Dame una receta de arepas | 0.822 | politica_vacaciones_y_permisos.md |
+| c) Fuera de dominio | F3 | ¿Quién ganó el último mundial de fútbol? | 0.749 | manual_reembolso_gastos.pdf |
+| c) Fuera de dominio | F4 | Explícame la teoría de la relatividad | 0.797 | politica_vacaciones_y_permisos.md |
+
+| Grupo | mín top-1 | máx top-1 |
+|---|---|---|
+| a) Legítimas | 0.867 | 0.900 |
+| b) Paráfrasis legítimas | 0.835 | 0.880 |
+| c) Fuera de dominio | 0.749 | 0.822 |
+
+min(top-1 a+b) = 0.835 → MIN_SCORE = 0.835 − 0.03 = 0.805
+max(top-1 c)   = 0.822
+Resultado: el umbral NO separa fuera de dominio; se usa igual para no perder legítimas (el filtro de fuera de dominio no es efectivo).
+exit=0

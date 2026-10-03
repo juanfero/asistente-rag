@@ -41,8 +41,9 @@ class Settings(BaseSettings):
     chunk_size: int = Field(default=800, ge=1)
     chunk_overlap: int = Field(default=120, ge=0)
     top_k: int = Field(default=4, ge=1)
-    # Provisional: se calibra en M7 (ADR-005) como filtro de ruido, no como abstención
-    min_score: float = Field(default=0.80, ge=0.0, le=1.0)
+    # Filtro de ruido calibrado en M7 (ADR-005): min(top-1 legítimas + paráfrasis) − 0,03.
+    # La abstención en preguntas de dominio sin respuesta la decide el LLM.
+    min_score: float = Field(default=0.805, ge=0.0, le=1.0)
 
     # Interfaces y logging
     api_url: str = "http://localhost:8000"

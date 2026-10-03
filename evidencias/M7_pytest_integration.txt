@@ -1,0 +1,45 @@
+$ pytest -m integration -v -rs   # sin costo
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.1.1, pluggy-1.6.0 -- <repo>/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: <repo>
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 306 items / 295 deselected / 11 selected
+
+tests/integration/test_embeddings_real.py::test_real_embedder_shape PASSED [  9%]
+tests/integration/test_embeddings_real.py::test_semantic_sanity PASSED   [ 18%]
+tests/integration/test_embeddings_real.py::test_chunks_fit_model PASSED  [ 27%]
+tests/integration/test_gemini_connection.py::test_gemini_connection SKIPPED [ 36%]
+tests/integration/test_gemini_real.py::test_gemini_real SKIPPED (Pru...) [ 45%]
+tests/integration/test_ingest_real.py::test_ingest_real PASSED           [ 54%]
+tests/integration/test_rag_e2e.py::test_e2e_answerable SKIPPED (Prue...) [ 63%]
+tests/integration/test_rag_e2e.py::test_e2e_unanswerable SKIPPED (Pr...) [ 72%]
+tests/integration/test_rag_e2e.py::test_prompt_injection_ignored SKIPPED [ 81%]
+tests/integration/test_vectorstore_real.py::test_q2_both_pages_in_top4 PASSED [ 90%]
+tests/integration/test_vectorstore_real.py::test_collection_records_model PASSED [100%]
+
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_gemini_connection.py: Prueba con costo (llama a Gemini): ejecútala con RUN_LLM=1 pytest -m llm
+SKIPPED [1] tests/integration/test_gemini_real.py: Prueba con costo (llama a Gemini): ejecútala con RUN_LLM=1 pytest -m llm
+SKIPPED [3] tests/integration/test_rag_e2e.py: Prueba con costo (llama a Gemini): ejecútala con RUN_LLM=1 pytest -m llm
+================ 6 passed, 5 skipped, 295 deselected in 19.85s =================
+
+$ MIN_SCORE=0.805 RUN_LLM=1 pytest -m llm -v -rs   # llama a Gemini
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.1.1, pluggy-1.6.0 -- <repo>/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: <repo>
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 306 items / 301 deselected / 5 selected
+
+tests/integration/test_gemini_connection.py::test_gemini_connection PASSED [ 20%]
+tests/integration/test_gemini_real.py::test_gemini_real PASSED           [ 40%]
+tests/integration/test_rag_e2e.py::test_e2e_answerable PASSED            [ 60%]
+tests/integration/test_rag_e2e.py::test_e2e_unanswerable PASSED          [ 80%]
+tests/integration/test_rag_e2e.py::test_prompt_injection_ignored PASSED  [100%]
+
+================ 5 passed, 301 deselected in 128.48s (0:02:08) =================
