@@ -44,6 +44,8 @@ def test_env_example_key_is_empty() -> None:
         ("GEMINI_API_KEY=valor-real", "GEMINI_API_KEY con valor"),
         ('export GEMINI_API_KEY="valor-real"', "GEMINI_API_KEY con valor"),
     ],
+    # ids fijos: sin ellos `pytest -v` imprime las claves falsas en el nombre del caso
+    ids=["google", "token", "env-line", "env-export"],
 )
 def test_detects_keys(text: str, kind: str) -> None:
     """Detecta cada patrón y reporta línea y tipo, sin incluir la clave."""

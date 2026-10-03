@@ -1,0 +1,29 @@
+$ python -m rag.cli ingest data/docs --reset
+Índice 'documentos' vaciado antes de ingerir.
+2026-10-03 10:13:46,110 INFO rag.embeddings - Modelo de embeddings 'intfloat/multilingual-e5-small' cargado en 4.4 s
+2026-10-03 10:13:46,433 INFO rag.vectorstore - Upsert de 6 chunks en 'documentos'
+2026-10-03 10:13:46,600 INFO rag.vectorstore - Upsert de 4 chunks en 'documentos'
+2026-10-03 10:13:46,818 INFO rag.vectorstore - Upsert de 6 chunks en 'documentos'
+Reporte de ingesta
+  Archivos procesados               3
+  Archivos omitidos                 0
+  Documentos (págs. PDF incluidas)  4
+  Chunks añadidos                   16
+  Total de chunks en el índice      16
+  Duración                          0.70 s
+Fuentes ingeridas:
+  - guia_onboarding_ti.txt
+  - manual_reembolso_gastos.pdf
+  - politica_vacaciones_y_permisos.md
+exit=0
+
+$ python -m rag.cli stats
+2026-10-03 10:13:56,156 INFO rag.embeddings - Modelo de embeddings 'intfloat/multilingual-e5-small' cargado en 4.3 s
+Colección: documentos
+Modelo de embeddings: intfloat/multilingual-e5-small (dim 384)
+Total de chunks: 16
+Fuentes:
+  - guia_onboarding_ti.txt             6 chunks
+  - manual_reembolso_gastos.pdf        4 chunks
+  - politica_vacaciones_y_permisos.md  6 chunks
+exit=0

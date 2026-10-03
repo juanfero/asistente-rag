@@ -1,0 +1,19 @@
+$ pytest -m integration -v -rs
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.1.1, pluggy-1.6.0 -- <repo>/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: <repo>
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 229 items / 222 deselected / 7 selected
+
+tests/integration/test_embeddings_real.py::test_real_embedder_shape PASSED [ 14%]
+tests/integration/test_embeddings_real.py::test_semantic_sanity PASSED   [ 28%]
+tests/integration/test_embeddings_real.py::test_chunks_fit_model PASSED  [ 42%]
+tests/integration/test_gemini_connection.py::test_gemini_connection PASSED [ 57%]
+tests/integration/test_ingest_real.py::test_ingest_real PASSED           [ 71%]
+tests/integration/test_vectorstore_real.py::test_q2_both_pages_in_top4 PASSED [ 85%]
+tests/integration/test_vectorstore_real.py::test_collection_records_model PASSED [100%]
+
+====================== 7 passed, 222 deselected in 22.34s ======================

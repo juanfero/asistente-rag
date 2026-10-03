@@ -137,6 +137,9 @@ def test_setup_logging() -> None:
 
     setup_logging("DEBUG")
     assert logging.getLogger().level == logging.DEBUG
+    # Las librerías ruidosas (peticiones HTTP de Hugging Face, etc.) quedan en WARNING
+    for name in ("httpx", "huggingface_hub", "sentence_transformers"):
+        assert logging.getLogger(name).level == logging.WARNING
 
 
 def test_env_file_prefix_keeps_trailing_space(tmp_path: Path) -> None:
