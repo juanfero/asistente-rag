@@ -1,0 +1,38 @@
+$ pytest -m integration -v -rs   # sin costo: las pruebas llm se omiten
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.1.1, pluggy-1.6.0 -- <repo>/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: <repo>
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 265 items / 257 deselected / 8 selected
+
+tests/integration/test_embeddings_real.py::test_real_embedder_shape PASSED [ 12%]
+tests/integration/test_embeddings_real.py::test_semantic_sanity PASSED   [ 25%]
+tests/integration/test_embeddings_real.py::test_chunks_fit_model PASSED  [ 37%]
+tests/integration/test_gemini_connection.py::test_gemini_connection SKIPPED [ 50%]
+tests/integration/test_gemini_real.py::test_gemini_real SKIPPED (Pru...) [ 62%]
+tests/integration/test_ingest_real.py::test_ingest_real PASSED           [ 75%]
+tests/integration/test_vectorstore_real.py::test_q2_both_pages_in_top4 PASSED [ 87%]
+tests/integration/test_vectorstore_real.py::test_collection_records_model PASSED [100%]
+
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_gemini_connection.py: Prueba con costo (llama a Gemini): ejecútala con RUN_LLM=1 pytest -m llm
+SKIPPED [1] tests/integration/test_gemini_real.py: Prueba con costo (llama a Gemini): ejecútala con RUN_LLM=1 pytest -m llm
+================ 6 passed, 2 skipped, 257 deselected in 19.95s =================
+
+$ RUN_LLM=1 pytest -m llm -v -rs   # llama a Gemini
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.1.1, pluggy-1.6.0 -- <repo>/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: <repo>
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 265 items / 263 deselected / 2 selected
+
+tests/integration/test_gemini_connection.py::test_gemini_connection PASSED [ 50%]
+tests/integration/test_gemini_real.py::test_gemini_real PASSED           [100%]
+
+====================== 2 passed, 263 deselected in 3.65s =======================

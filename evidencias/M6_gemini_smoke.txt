@@ -1,0 +1,18 @@
+$ python scripts/gemini_smoke.py   # key enmascarada
+API key: **** · modelo: gemini-3.1-flash-lite
+LLM_MAX_TOKENS: 700 · temperatura: 0.1
+Pregunta: ¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?
+Chunks recuperados:
+  [1] 0.867 · manual_reembolso_gastos.pdf pág=1 · 536 car.
+  [2] 0.863 · manual_reembolso_gastos.pdf pág=2 · 785 car.
+  [3] 0.813 · politica_vacaciones_y_permisos.md pág=- · 646 car.
+  [4] 0.811 · politica_vacaciones_y_permisos.md pág=- · 631 car.
+Tamaño del prompt: system 279 + user 2901 caracteres (contexto 2800)
+
+Respuesta:
+El tope diario de alimentación para viajes nacionales es de COP 120.000 [1], mientras que para viajes internacionales es de USD 90 [2].
+
+finish_reason: stop
+prompt_tokens: 899 · completion_tokens: 36 · reasoning_tokens: None
+latencia: 0.98 s
+exit=0

@@ -92,3 +92,31 @@ def test_staged_scan_blocks_key(tmp_path: Path) -> None:
     assert result.returncode == 1
     assert "config.txt:1" in result.stderr
     assert FAKE_GOOGLE not in result.stderr + result.stdout
+
+
+@pytest.mark.parametrize(
+    ("text", "expected", "code"),
+    [
+        ("historial limpio\nsin claves\n", "0 coincidencias", 0),
+        (f"commit\n+ key = {FAKE_GOOGLE}\n+ t = {FAKE_TOKEN}\n", "2 coincidencias", 1),
+    ],
+    ids=["limpio", "con-claves"],
+)
+def test_stdin_mode_only_counts(text: str, expected: str, code: int) -> None:
+    """`--stdin` solo informa el conteo (nunca el contenido) y sale con 1 si hay claves."""
+    script = PROJECT_ROOT / "scripts" / "secret_scan.py"
+    result = subprocess.run(
+        ["python3", str(script), "--stdin"], input=text, capture_output=True, text=True
+    )
+    assert result.returncode == code
+    assert result.stdout.strip() == expected
+    assert FAKE_GOOGLE not in result.stdout + result.stderr
+    assert FAKE_TOKEN not in result.stdout + result.stderr
+
+
+def test_git_history_has_no_secrets() -> None:
+    """M11-06: el historial completo de git no contiene claves (patrones estrictos)."""
+    log = subprocess.run(
+        ["git", "log", "--all", "-p"], cwd=PROJECT_ROOT, capture_output=True, text=True
+    ).stdout
+    assert secret_scan.count_stdin(log.splitlines()) == 0

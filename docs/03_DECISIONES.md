@@ -118,3 +118,11 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
   - Nuevos criterios de errores de créditos/autenticación/límite (M6-08…M6-10) y su propagación a CLI (código 2), API (503/429) y UI (`st.warning`) en M7, M8 y M9.
   - Seguridad reforzada: `tests/unit/test_no_secrets.py`, `scripts/secret_scan.py` y hook `scripts/pre-commit`; la key nunca se imprime (solo `****` + últimos 4).
   - Gemini 3.x puede consumir `max_tokens` en razonamiento: se verifica en `check_gemini.py` y se documenta en ADR-003.
+  - **Regla de clasificación de errores 402/429** (en orden, sin distinguir mayúsculas, sobre el mensaje + el cuerpo/detalles del error, incluido el cuerpo envuelto en lista `[{"error": …}]`):
+    a. HTTP 402 → `LLMQuotaExhaustedError`.
+    b. 429 que contiene `PerDay` (p. ej. `quotaId` `GenerateRequestsPerDayPerProjectPerModel-FreeTier`) → `LLMQuotaExhaustedError`.
+    c. 429 que contiene `PerMinute` → `LLMRateLimitError`.
+    d. 429 que contiene `billing`, `credit` o `prepay` → `LLMQuotaExhaustedError`.
+    e. Cualquier otro 429 → `LLMRateLimitError`.
+    `quota` **no** se usa: Gemini lo incluye en casi todos los 429 ("You exceeded your current quota"), también en los de límite por minuto. Se clasifica después de los reintentos del SDK (`max_retries=2`).
+  - Pruebas que llaman a Gemini: marcador `llm`, opt-in con `RUN_LLM=1` (sin costo por defecto).

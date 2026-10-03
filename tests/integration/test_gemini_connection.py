@@ -5,7 +5,7 @@ from openai import OpenAI
 
 from rag.config import Settings
 
-pytestmark = pytest.mark.integration
+pytestmark = [pytest.mark.integration, pytest.mark.llm]
 
 
 @pytest.fixture(scope="module")

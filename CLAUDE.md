@@ -10,7 +10,7 @@ Prueba técnica AI Developer Engineer Junior (I Cloud Seven). Asistente RAG en P
 - Vector store: ChromaDB persistente en `data/chroma/`, métrica coseno.
 - PDF: `pypdf`. Chunking: implementación propia.
 - API: FastAPI. UI: Streamlit (consume la API). Config: `pydantic-settings`.
-- Tests: pytest (marcador `integration` para todo lo que llame a Gemini o descargue modelos). Lint: ruff.
+- Tests: pytest. Marcador `integration` (red/modelos) y `llm` (llama a Gemini; solo con `RUN_LLM=1`). Lint: ruff.
 - **No usar** LangChain ni LlamaIndex.
 
 ## Reglas de trabajo
@@ -27,7 +27,9 @@ Prueba técnica AI Developer Engineer Junior (I Cloud Seven). Asistente RAG en P
 ```bash
 source .venv/bin/activate
 pytest -m "not integration" -q          # rápido, sin red
-pytest -m integration -q                # requiere GEMINI_API_KEY / descarga de modelos
+pytest -m integration -q                # sin costo: embeddings/Chroma (las pruebas llm se omiten)
+RUN_LLM=1 pytest -m llm -q              # llama a Gemini (consume créditos; requiere GEMINI_API_KEY)
+git log --all -p | python scripts/secret_scan.py --stdin   # historial sin claves → "0 coincidencias"
 ruff check src tests && ruff format --check src tests
 python -m rag.cli ingest data/docs      # desde M5
 python -m rag.cli ask "pregunta"        # desde M7

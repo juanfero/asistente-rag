@@ -10,7 +10,7 @@ Regla de oro: **un módulo solo se cierra cuando todas sus pruebas pasan** (`pyt
 | M3 | [Embeddings](modulos/M3_embeddings.md) | Embeddings locales multilingües normalizados | R3 | M0 | ✅ Completado (M3.1: e5-small 800/120, ADR-009) |
 | M4 | [Vector store (Chroma)](modulos/M4_vectorstore.md) | Persistencia, upsert idempotente, consulta por similitud con score | R4, R7 | M2, M3 | ✅ Completado |
 | M5 | [Pipeline de ingesta + CLI](modulos/M5_ingesta.md) | `rag ingest` de punta a punta, re-ingesta idempotente | R1–R5 | M1–M4 | ✅ Completado |
-| M6 | [Cliente LLM Gemini](modulos/M6_llm_gemini.md) | Interfaz LLM, cliente Gemini, FakeLLM, errores (créditos agotados, key inválida, límite por minuto) | R8 | M0 | ⬜ Pendiente |
+| M6 | [Cliente LLM Gemini](modulos/M6_llm_gemini.md) | Interfaz LLM, cliente Gemini, FakeLLM, errores (créditos agotados, key inválida, límite por minuto) | R8 | M0 | ✅ Completado |
 | M7 | [Motor RAG](modulos/M7_motor_rag.md) | Retrieve + umbral + prompt grounded + respuesta con citas + `rag ask` | R6–R9 | M4–M6 | ⬜ Pendiente |
 | M8 | [API FastAPI](modulos/M8_api.md) | `/health`, `/documents`, `/ingest`, `/ask` | R6 | M7 | ⬜ Pendiente |
 | M9 | [UI Streamlit](modulos/M9_ui_streamlit.md) | Subir documentos, preguntar, ver fuentes | R6 | M8 | ⬜ Pendiente |

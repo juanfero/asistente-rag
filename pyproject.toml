@@ -41,7 +41,8 @@ testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "--strict-markers"
 markers = [
-    "integration: llama a servicios externos (xAI) o descarga modelos; requiere red/credenciales",
+    "integration: requiere red, modelos descargados o servicios externos (sin costo salvo `llm`)",
+    "llm: llama a Gemini (consume créditos); solo corre con RUN_LLM=1 y GEMINI_API_KEY",
 ]
 
 [tool.ruff]

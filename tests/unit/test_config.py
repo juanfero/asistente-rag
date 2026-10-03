@@ -152,3 +152,20 @@ def test_env_file_prefix_keeps_trailing_space(tmp_path: Path) -> None:
     s = Settings(_env_file=env_file)
     assert s.embedding_query_prefix == "query: "
     assert s.embedding_passage_prefix == "passage: "
+
+
+@pytest.mark.parametrize(
+    ("environ", "has_key", "skipped"),
+    [
+        ({}, True, True),
+        ({"RUN_LLM": "0"}, True, True),
+        ({"RUN_LLM": "1"}, False, True),
+        ({"RUN_LLM": "1"}, True, False),
+    ],
+    ids=["sin-opt-in", "run-llm-0", "sin-key", "habilitado"],
+)
+def test_llm_tests_are_opt_in(environ: dict, has_key: bool, skipped: bool) -> None:
+    """Las pruebas `llm` solo corren con RUN_LLM=1 y GEMINI_API_KEY presentes."""
+    from conftest import llm_skip_reason
+
+    assert (llm_skip_reason(environ, has_key) is not None) is skipped
