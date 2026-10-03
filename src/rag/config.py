@@ -1,5 +1,6 @@
 """Configuración centralizada del proyecto (variables de entorno y `.env`)."""
 
+import logging
 from functools import lru_cache
 from pathlib import Path
 
@@ -33,6 +34,7 @@ class Settings(BaseSettings):
 
     # Datos y vector store
     docs_dir: Path = Path("data/docs")
+    uploads_dir: Path = Path("data/uploads")  # subidas por la API (fuera del corpus versionado)
     chroma_dir: Path = Path("data/chroma")
     chroma_collection: str = "documentos"
 
@@ -64,3 +66,40 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     """Devuelve la instancia única (cacheada) de `Settings`."""
     return Settings()
+
+
+# Parámetros calibrados: si un .env los sobrescribe, se avisa al arrancar
+CALIBRATED_FIELDS = ("min_score", "chunk_size", "chunk_overlap")
+
+
+def effective_settings(settings: Settings) -> dict[str, object]:
+    """Valores efectivos de la configuración, sin la API key (solo indica si está definida)."""
+    values = settings.model_dump(exclude={"gemini_api_key"})
+    key = settings.gemini_api_key
+    values["gemini_api_key_configured"] = bool(key and key.get_secret_value())
+    return {k: str(v) if isinstance(v, Path) else v for k, v in values.items()}
+
+
+def calibrated_overrides(settings: Settings) -> dict[str, tuple[object, object]]:
+    """Calibrados que difieren del default: {campo: (efectivo, default)}."""
+    fields = type(settings).model_fields
+    return {
+        name: (getattr(settings, name), fields[name].default)
+        for name in CALIBRATED_FIELDS
+        if getattr(settings, name) != fields[name].default
+    }
+
+
+def log_effective_settings(settings: Settings, logger: logging.Logger | None = None) -> None:
+    """Registra en INFO la configuración efectiva y en WARNING los calibrados sobrescritos."""
+    logger = logger or logging.getLogger("rag.config")
+    values = effective_settings(settings)
+    logger.info("Configuración efectiva: %s", ", ".join(f"{k}={v}" for k, v in values.items()))
+    for name, (value, default) in calibrated_overrides(settings).items():
+        logger.warning(
+            "%s=%s difiere del valor calibrado en el código (%s). Revisa tu .env si no es "
+            "intencional.",
+            name.upper(),
+            value,
+            default,
+        )

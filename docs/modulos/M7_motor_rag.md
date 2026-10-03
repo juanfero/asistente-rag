@@ -77,6 +77,7 @@ Guardar salidas en `evidencias/M7_cli_ask.txt`.
 | 2026-10-03 | `pytest -m "not integration" -v` | 295 passed, 11 deselected | `evidencias/M7_pytest_ruff.txt` |
 | 2026-10-03 | `pytest -m integration -v -rs` / `RUN_LLM=1 pytest -m llm -v -rs` | 6 passed + 5 skipped / 5 passed (2:08) | `evidencias/M7_pytest_integration.txt` |
 | 2026-10-03 | `ruff check src tests && ruff format --check src tests` | All checks passed! / 33 files already formatted | |
+| 2026-10-03 | **fix(M6/M7)**: `.env.example` con los parámetros de ajuste comentados; CLI registra la configuración efectiva (INFO, sin key) y avisa (WARNING) si `MIN_SCORE`, `CHUNK_SIZE` o `CHUNK_OVERLAP` difieren del código; reintentos del SDK openai como WARNING | OK | Motivo: el `.env` local tenía `MIN_SCORE=0.80` y sobrescribía el valor calibrado sin aviso |
 
 **Estado de criterios:** M7-01 ✅ · M7-02 ✅ · M7-03 ✅ · M7-04 ✅ · M7-05 ✅ · M7-06 ✅ · M7-07 ✅ · M7-08 ✅ · M7-09 ✅ (`RUN_LLM=1`) · M7-10 ✅ (`RUN_LLM=1`) · M7-11 ✅ · M7-12 ✅ (`RUN_LLM=1`).
 

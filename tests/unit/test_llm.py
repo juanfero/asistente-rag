@@ -13,6 +13,7 @@ from rag.llm import (
     EMPTY_RESPONSE_MESSAGE,
     QUOTA_EXHAUSTED_MESSAGE,
     RATE_LIMIT_MESSAGE,
+    RATE_LIMIT_UNKNOWN_MESSAGE,
     FakeLLM,
     GeminiClient,
     LLMAuthError,
@@ -284,20 +285,34 @@ PER_MINUTE = gemini_error(
                 429, "Resource has been exhausted (e.g. check quota).", "RESOURCE_EXHAUSTED"
             ),
             LLMRateLimitError,
-            RATE_LIMIT_MESSAGE,
+            RATE_LIMIT_UNKNOWN_MESSAGE,
         ),  # regla e
+        (
+            gemini_error(429, QUOTA_MSG, "RESOURCE_EXHAUSTED"),
+            LLMRateLimitError,
+            RATE_LIMIT_UNKNOWN_MESSAGE,
+        ),  # mensaje real con "billing details" SIN details → regla e (no es créditos)
         (
             gemini_error(429, "Your prepayment credits are depleted.", "RESOURCE_EXHAUSTED"),
             LLMQuotaExhaustedError,
             QUOTA_EXHAUSTED_MESSAGE,
-        ),  # regla d
+        ),  # regla d (prepay)
         (
-            gemini_error(429, "Check your billing account.", "RESOURCE_EXHAUSTED"),
+            gemini_error(429, "You have no remaining credits.", "RESOURCE_EXHAUSTED"),
             LLMQuotaExhaustedError,
             QUOTA_EXHAUSTED_MESSAGE,
-        ),  # regla d
+        ),  # regla d (credits)
     ],
-    ids=["dia", "dia-lista", "minuto", "minuto-lista", "sin-details", "credit-prepay", "billing"],
+    ids=[
+        "dia",
+        "dia-lista",
+        "minuto",
+        "minuto-lista",
+        "sin-details",
+        "mensaje-real-billing-sin-details",
+        "prepay",
+        "credits",
+    ],
 )
 def test_429_daily_vs_per_minute(settings: Settings, body, expected, message) -> None:
     """M6-09: 429 diario/créditos → QuotaExhausted; por minuto o sin detalle → RateLimit."""

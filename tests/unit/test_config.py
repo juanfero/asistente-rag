@@ -169,3 +169,59 @@ def test_llm_tests_are_opt_in(environ: dict, has_key: bool, skipped: bool) -> No
     from conftest import llm_skip_reason
 
     assert (llm_skip_reason(environ, has_key) is not None) is skipped
+
+
+def test_log_effective_settings(caplog: pytest.LogCaptureFixture) -> None:
+    """INFO con los valores efectivos (sin la key) y WARNING si un calibrado difiere."""
+    from rag.config import calibrated_overrides, log_effective_settings
+
+    s = Settings(_env_file=None, gemini_api_key=FAKE_KEY)
+    with caplog.at_level(logging.INFO):
+        log_effective_settings(s)
+    assert "min_score=0.805" in caplog.text and "chunk_size=800" in caplog.text
+    assert "gemini_api_key_configured=True" in caplog.text
+    assert FAKE_KEY not in caplog.text
+    assert not [r for r in caplog.records if r.levelno == logging.WARNING]
+    assert calibrated_overrides(s) == {}
+
+    caplog.clear()
+    changed = Settings(_env_file=None, min_score=0.8, chunk_size=500, chunk_overlap=80, top_k=6)
+    with caplog.at_level(logging.INFO):
+        log_effective_settings(changed)
+    warnings = [r.getMessage() for r in caplog.records if r.levelno == logging.WARNING]
+    assert len(warnings) == 3  # top_k no es calibrado de tokens/umbral: no avisa
+    assert any("MIN_SCORE=0.8" in w and "0.805" in w for w in warnings)
+
+
+def test_env_example_keeps_calibrated_defaults() -> None:
+    """Con .env.example tal cual, los parámetros de ajuste quedan en los valores del código."""
+    from rag.loaders import PROJECT_ROOT
+
+    s = Settings(_env_file=PROJECT_ROOT / ".env.example")
+    defaults = Settings(_env_file=None)
+    for name in (
+        "min_score",
+        "chunk_size",
+        "chunk_overlap",
+        "top_k",
+        "llm_temperature",
+        "llm_max_tokens",
+    ):
+        assert getattr(s, name) == getattr(defaults, name), name
+    assert s.uploads_dir == Path("data/uploads")
+
+
+def test_openai_retries_logged_as_warning(capsys: pytest.CaptureFixture[str]) -> None:
+    """Los reintentos del SDK openai aparecen como WARNING; su otro INFO queda oculto.
+
+    Se lee la salida real (capsys): setup_logging(force=True) reemplaza el handler de caplog.
+    """
+    from rag.logging_conf import OPENAI_RETRY_LOGGER
+
+    setup_logging("INFO")
+    sdk = logging.getLogger(OPENAI_RETRY_LOGGER)
+    sdk.info("Retrying request in 0.48 seconds (retry 1 of 2)")
+    sdk.info("Request options: {...}")
+    err = capsys.readouterr().err
+    assert "WARNING openai._base_client - Retrying request in 0.48 seconds" in err
+    assert "Request options" not in err

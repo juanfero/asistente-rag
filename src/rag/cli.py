@@ -5,7 +5,7 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
-from rag.config import Settings, get_settings
+from rag.config import Settings, get_settings, log_effective_settings
 from rag.embeddings import Embedder
 from rag.ingest import IngestReport, build_store, ingest_paths
 from rag.llm import LLMClient, LLMError, LLMResult, get_llm
@@ -160,6 +160,7 @@ def main(
     args = _parser().parse_args(argv)
     settings = settings or get_settings()
     setup_logging(settings.log_level)
+    log_effective_settings(settings)
 
     if args.command == "reset":
         if not args.yes:

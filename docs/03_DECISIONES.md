@@ -151,7 +151,7 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
     a. HTTP 402 → `LLMQuotaExhaustedError`.
     b. 429 que contiene `PerDay` (p. ej. `quotaId` `GenerateRequestsPerDayPerProjectPerModel-FreeTier`) → `LLMQuotaExhaustedError`.
     c. 429 que contiene `PerMinute` → `LLMRateLimitError`.
-    d. 429 que contiene `billing`, `credit` o `prepay` → `LLMQuotaExhaustedError`.
-    e. Cualquier otro 429 → `LLMRateLimitError`.
-    `quota` **no** se usa: Gemini lo incluye en casi todos los 429 ("You exceeded your current quota"), también en los de límite por minuto. Se clasifica después de los reintentos del SDK (`max_retries=2`).
+    d. 429 que contiene `prepay` o `credits` (créditos prepago agotados) → `LLMQuotaExhaustedError`.
+    e. Cualquier otro 429 → `LLMRateLimitError` con el mensaje: "Límite de solicitudes de Gemini alcanzado. Espera un minuto e intenta de nuevo. Si el error persiste, es posible que se hayan agotado los créditos: cambia GEMINI_API_KEY en .env y reinicia."
+    `quota` y `billing` **no** se usan: Gemini incluye "You exceeded your current quota, please check your plan and billing details" en casi todos sus 429, también en los de límite por minuto (**corrección del 2026-10-03**: la regla d original usaba `billing` y clasificaba mal un 429 por minuto sin `details`). Se clasifica después de los reintentos del SDK (`max_retries=2`).
   - Pruebas que llaman a Gemini: marcador `llm`, opt-in con `RUN_LLM=1` (sin costo por defecto).

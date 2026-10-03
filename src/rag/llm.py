@@ -20,6 +20,11 @@ QUOTA_EXHAUSTED_MESSAGE = (
 RATE_LIMIT_MESSAGE = (
     "Límite de solicitudes por minuto alcanzado. Espera unos segundos e intenta de nuevo."
 )
+RATE_LIMIT_UNKNOWN_MESSAGE = (
+    "Límite de solicitudes de Gemini alcanzado. Espera un minuto e intenta de nuevo. Si el error "
+    "persiste, es posible que se hayan agotado los créditos: cambia GEMINI_API_KEY en .env y "
+    "reinicia."
+)
 AUTH_MESSAGE = "La API key de Gemini no es válida o fue revocada. Revisa GEMINI_API_KEY en .env."
 EMPTY_RESPONSE_MESSAGE = (
     "El modelo devolvió una respuesta vacía. Intenta de nuevo o reformula la pregunta."
@@ -74,8 +79,10 @@ def _error_text(exc: openai.APIStatusError) -> str:
 def map_api_error(exc: openai.APIStatusError, model: str) -> LLMError:
     """Traduce un error HTTP de Gemini a la excepción propia (regla de ADR-010).
 
-    429: "PerDay" → cuota agotada; "PerMinute" → límite por minuto; "billing"/"credit"/"prepay"
-    → cuota agotada; otro 429 → límite por minuto. "quota" no se usa: aparece en casi todos.
+    429, en orden: "PerDay" → cuota agotada; "PerMinute" → límite por minuto; "prepay" o
+    "credits" → créditos agotados; cualquier otro 429 → límite (mensaje que menciona la
+    posibilidad de créditos agotados). "quota" y "billing" no se usan: Gemini los incluye en casi
+    todos sus 429 ("You exceeded your current quota, please check your plan and billing details").
     """
     status = exc.status_code
     text = _error_text(exc)
@@ -86,9 +93,9 @@ def map_api_error(exc: openai.APIStatusError, model: str) -> LLMError:
             return LLMQuotaExhaustedError(QUOTA_EXHAUSTED_MESSAGE)
         if "perminute" in text:
             return LLMRateLimitError(RATE_LIMIT_MESSAGE)
-        if any(word in text for word in ("billing", "credit", "prepay")):
+        if "prepay" in text or "credits" in text:
             return LLMQuotaExhaustedError(QUOTA_EXHAUSTED_MESSAGE)
-        return LLMRateLimitError(RATE_LIMIT_MESSAGE)
+        return LLMRateLimitError(RATE_LIMIT_UNKNOWN_MESSAGE)
     if status in (401, 403) or (status == 400 and "api_key_invalid" in text):
         return LLMAuthError(AUTH_MESSAGE)
     if status == 404:

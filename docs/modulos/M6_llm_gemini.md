@@ -23,9 +23,9 @@ Encapsular la generación de texto con **Gemini** (endpoint compatible con OpenA
     a. HTTP 402 → `LLMQuotaExhaustedError`.
     b. 429 que contiene `PerDay` (p. ej. `quotaId` `GenerateRequestsPerDayPerProjectPerModel-FreeTier`) → `LLMQuotaExhaustedError`.
     c. 429 que contiene `PerMinute` → `LLMRateLimitError`.
-    d. 429 que contiene `billing`, `credit` o `prepay` → `LLMQuotaExhaustedError`.
-    e. Cualquier otro 429 → `LLMRateLimitError`.
-    `quota` **no** se usa: Gemini lo incluye en casi todos los 429 ("You exceeded your current quota"), también en los de límite por minuto. Se clasifica después de los reintentos del SDK (`max_retries=2`).
+    d. 429 que contiene `prepay` o `credits` (créditos prepago agotados) → `LLMQuotaExhaustedError`.
+    e. Cualquier otro 429 → `LLMRateLimitError` con el mensaje: "Límite de solicitudes de Gemini alcanzado. Espera un minuto e intenta de nuevo. Si el error persiste, es posible que se hayan agotado los créditos: cambia GEMINI_API_KEY en .env y reinicia."
+    `quota` y `billing` **no** se usan: Gemini incluye "You exceeded your current quota, please check your plan and billing details" en casi todos sus 429, también en los de límite por minuto (**corrección del 2026-10-03**: la regla d original usaba `billing` y clasificaba mal un 429 por minuto sin `details`). Se clasifica después de los reintentos del SDK (`max_retries=2`).
   - `LLMResult` incluye además `finish_reason` y `reasoning_tokens` (si vienen en `usage`). Respuesta vacía → `LLMError("El modelo devolvió una respuesta vacía…")`.
   - Pruebas que llaman a Gemini: marcador `llm` (solo con `RUN_LLM=1` y `GEMINI_API_KEY`).
   - **Tokens de razonamiento:** Gemini 3.x puede "pensar" y esos tokens consumen `max_tokens`; ver ADR-003 (se valida con `scripts/check_gemini.py`).
@@ -71,4 +71,4 @@ python scripts/gemini_smoke.py      # prompt RAG real (evidencias/M6_gemini_smok
 
 **Pruebas adicionales:** `test_default_sdk_client`, `test_timeout_mapping`, `test_not_found_message_names_model`, `test_empty_response` (×3), `test_429_classified_after_sdk_retries` (3 llamadas = 1 + 2 reintentos), `test_other_400_is_generic`; `test_stdin_mode_only_counts`, `test_git_history_has_no_secrets`, `test_llm_tests_are_opt_in`.
 
-**Observación para decidir más adelante:** el mensaje real de los 429 de Gemini dice "…check your plan and **billing** details…". Si un 429 llega **sin** `details` pero con ese mensaje, la regla (d) lo clasificará como créditos agotados aunque sea por minuto. Con `details` (caso habitual) la regla (c) lo clasifica bien.
+**Observación (resuelta el 2026-10-03):** el mensaje real de los 429 de Gemini dice "…check your plan and **billing** details…"; con la regla original, un 429 por minuto sin `details` se clasificaba como créditos agotados. Se corrigió la regla d (`prepay`/`credits`) y se añadió el caso `mensaje-real-billing-sin-details` → `LLMRateLimitError`.
