@@ -360,3 +360,13 @@ def test_startup_warmup_lazy_llm_and_lock(tmp_path: Path) -> None:
         app.state.engine.settings = app.state.settings
         resp = c.post("/ask", json={"question": "¿Tope de alimentación?"})
         assert resp.status_code == 503 and resp.json()["error"] == "LLM_AUTH_ERROR"
+
+
+def test_not_grounded_has_no_sources(tmp_path: Path) -> None:
+    """Respuesta "no encontré" → sources vacía; context conserva lo recuperado."""
+    from rag.prompts import NOT_FOUND_MESSAGE
+
+    c = make_client(tmp_path, llm=FakeLLM([NOT_FOUND_MESSAGE]))
+    body = c.post("/ask", json={"question": "¿Trabajo remoto?"}).json()
+    assert body["grounded"] is False
+    assert body["sources"] == [] and len(body["context"]) == 4

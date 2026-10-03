@@ -81,6 +81,7 @@ Captura de Swagger y salidas de curl en `evidencias/`.
 | 2026-10-03 | `pytest -m "not integration" -v` | 337 passed, 12 deselected | `evidencias/M8_pytest_ruff.txt` |
 | 2026-10-03 | `pytest -m integration -v -rs` / `RUN_LLM=1 pytest -m llm -v -rs` | 6 passed + 6 skipped / 6 passed | `evidencias/M8_pytest_integration.txt` |
 | 2026-10-03 | `ruff check src tests && ruff format --check src tests` | All checks passed! / 37 files already formatted | |
+| 2026-10-03 | **fix(M7/M8)**: con `grounded=False` → `sources = []` (`context` conserva lo recuperado); evidencias regeneradas con los comandos curl entre comillas (copiables) | OK | Q8 ahora devuelve `"sources": []`. Al detener la API, `$!` apuntaba a una subshell (el `&` cerraba una cadena `&&`) y uvicorn quedó vivo: se detuvo con el PID real obtenido de `ss -ltnp` |
 
 **Estado de criterios:** M8-01 ✅ · M8-02 ✅ · M8-03 ✅ · M8-04 ✅ · M8-05 ✅ · M8-06 ✅ · M8-07 ✅ · M8-08 ✅ · M8-09 ✅ · M8-10 ✅ · M8-11 ✅.
 

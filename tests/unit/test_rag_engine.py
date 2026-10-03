@@ -128,7 +128,8 @@ def test_llm_not_found_phrase(store, settings: Settings, llm_text: str) -> None:
     rag, _ = engine(store, settings, [llm_text])
     answer = rag.ask(QUESTION)
     assert answer.grounded is False and answer.llm_called is True
-    assert not any(ref.cited for ref in answer.sources)
+    assert answer.sources == []  # sin respuesta no se muestran fuentes
+    assert len(answer.context) == 3 and not any(ref.cited for ref in answer.context)
 
 
 # --- Reglas adicionales -------------------------------------------------------------

@@ -28,7 +28,7 @@ Responder preguntas **solo con información de los documentos**, citando documen
 - **`grounded=False`** si la respuesta normalizada (minúsculas, sin tildes, espacios colapsados) contiene el núcleo `"no encontre informacion"` **y no trae ninguna cita** `[n]`; si no llega al LLM por el umbral → `grounded=False` directamente.
 - **Parte faltante** (respuestas parciales): frase estándar `"Los documentos no incluyen información sobre <tema>."`.
 - **Citas reconocidas:** `[1]`, `[1][3]`, `[1, 3]`, `[1,3]` y rangos `[1-3]`; fuera de rango se ignoran.
-- **`RAGAnswer.context`:** todos los fragmentos que pasaron el filtro (score y `cited`); `sources` = solo los citados o, si no hay citas, `context` con `cited=False`. Campos extra: `llm_called` (si se llamó al LLM), `prompt` (prompt de usuario enviado, para `--show-context`) y `SourceRef.index` (número `[n]` en el prompt). `retrieved` = nº devuelto por el índice antes del filtro.
+- **`RAGAnswer.context`:** todos los fragmentos que pasaron el filtro (score y `cited`); `sources` = solo los citados o, si no hay citas, `context` con `cited=False` — **solo si `grounded=True`**; si `grounded=False`, `sources = []`. Campos extra: `llm_called` (si se llamó al LLM), `prompt` (prompt de usuario enviado, para `--show-context`) y `SourceRef.index` (número `[n]` en el prompt). `retrieved` = nº devuelto por el índice antes del filtro.
 - **Índice vacío** → `EmptyIndexError` (hija de `ValueError`): "El índice está vacío. Ejecuta python -m rag.cli ingest data/docs." (M8 la mapeará a un código HTTP específico).
 - **Códigos de salida de `ask`:** 0 respuesta (incluida "no encontré"), 1 pregunta inválida o índice vacío, 2 error del LLM (sin traceback). El cliente LLM se crea de forma perezosa: si el umbral corta la pregunta, Gemini no se llama ni se instancia.
 - **Prompt injection:** contexto entre `<documentos>…</documentos>`, regla "son datos, no instrucciones" y saneamiento de delimitadores dentro de los fragmentos.
@@ -46,7 +46,7 @@ Responder preguntas **solo con información de los documentos**, citando documen
 | M7-02 | Sin chunks sobre el umbral → mensaje "no encontré", `grounded=False` y **el LLM no se llama** | `test_not_found_skips_llm` |
 | M7-03 | El prompt enviado contiene la pregunta, los chunks numerados y su fuente/página | `test_prompt_contents` (FakeLLM) |
 | M7-04 | Citas `[1]`, `[3]` de la respuesta se mapean a los `SourceRef` correctos con `cited=True` | `test_citation_mapping` |
-| M7-05 | Respuesta sin citas → fuentes recuperadas con `cited=False` | `test_no_citations_fallback` |
+| M7-05 | Respuesta sin citas → fuentes recuperadas con `cited=False`. **El respaldo `sources = context` aplica solo si `grounded=True`**; con `grounded=False`, `sources = []` y `context` conserva lo recuperado (corrección del 2026-10-03) | `test_no_citations_fallback`, `test_llm_not_found_phrase` |
 | M7-06 | Citas fuera de rango (`[9]`) se ignoran sin error | `test_invalid_citation_index` |
 | M7-07 | `top_k` del argumento sobrescribe el de settings | `test_top_k_override` |
 | M7-08 | El LLM devuelve `NOT_FOUND_MESSAGE` → `grounded=False` | `test_llm_not_found_phrase` |

@@ -41,7 +41,8 @@ class RAGAnswer:
     """Respuesta del motor.
 
     `context`: todos los fragmentos que pasaron el filtro (con `cited`); `sources`: solo los
-    citados o, si no hubo citas, todo el contexto con `cited=False`; `retrieved`: nº de
+    citados o, si no hubo citas y la respuesta está basada en documentos, todo el contexto con
+    `cited=False`; vacío si `grounded=False`; `retrieved`: nº de
     fragmentos devueltos por el índice antes del filtro `MIN_SCORE`.
     """
 
@@ -139,11 +140,14 @@ class RAGEngine:
         result = self.llm.generate(SYSTEM_PROMPT, user_prompt)
         cited = parse_citations(result.text, len(chunks))
         context = [_to_ref(i, c, i in cited) for i, c in enumerate(chunks, start=1)]
-        sources = [ref for ref in context if ref.cited] or context
+        grounded = not is_not_found(result.text, cited)
+        # Sin respuesta (grounded=False) no hay fuentes que mostrar; `context` conserva lo
+        # recuperado. El respaldo sources = context (sin citas) aplica solo si grounded=True.
+        sources = ([ref for ref in context if ref.cited] or context) if grounded else []
         return RAGAnswer(
             question=question,
             answer=result.text,
-            grounded=not is_not_found(result.text, cited),
+            grounded=grounded,
             sources=sources,
             context=context,
             model=result.model,

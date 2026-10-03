@@ -1,6 +1,6 @@
 # MIN_SCORE=0.805 (calibrado, ADR-005) pasado como variable de entorno: el .env local aún tenía 0.80
 
-$ MIN_SCORE=0.805 python -m rag.cli ask ¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales? --show-context
+$ MIN_SCORE=0.805 python -m rag.cli ask "¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?" --show-context
 2026-10-03 14:56:37,655 INFO rag.embeddings - Modelo de embeddings 'intfloat/multilingual-e5-small' cargado en 4.4 s
 2026-10-03 14:56:47,957 INFO rag.llm - LLM gemini-3.1-flash-lite: 10.26 s, tokens 1058/35, finish_reason=stop
 Respuesta:
@@ -82,7 +82,7 @@ exit=0
 
 ==================================================================
 
-$ MIN_SCORE=0.805 python -m rag.cli ask ¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?
+$ MIN_SCORE=0.805 python -m rag.cli ask "¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?"
 2026-10-03 14:56:58,481 INFO rag.embeddings - Modelo de embeddings 'intfloat/multilingual-e5-small' cargado en 5.1 s
 2026-10-03 14:57:00,465 INFO rag.llm - LLM gemini-3.1-flash-lite: 1.94 s, tokens 904/26, finish_reason=stop
 Respuesta:
@@ -96,24 +96,20 @@ exit=0
 
 ==================================================================
 
-$ MIN_SCORE=0.805 python -m rag.cli ask ¿Cuántos días a la semana puedo trabajar remoto?
-2026-10-03 14:57:11,452 INFO rag.embeddings - Modelo de embeddings 'intfloat/multilingual-e5-small' cargado en 5.0 s
-2026-10-03 14:57:22,246 INFO rag.llm - LLM gemini-3.1-flash-lite: 10.75 s, tokens 864/12, finish_reason=stop
+$ MIN_SCORE=0.805 python -m rag.cli ask "¿Cuántos días a la semana puedo trabajar remoto?"   # regenerado tras fix(M7/M8): sin fuentes cuando grounded=False
+2026-10-03 15:33:49,116 INFO rag.config - Configuración efectiva: gemini_base_url=https://generativelanguage.googleapis.com/v1beta/openai/, gemini_model=gemini-3.1-flash-lite, llm_temperature=0.1, llm_max_tokens=700, embedding_model=intfloat/multilingual-e5-small, embedding_query_prefix=query: , embedding_passage_prefix=passage: , docs_dir=data/docs, uploads_dir=data/uploads, chroma_dir=data/chroma, chroma_collection=documentos, chunk_size=800, chunk_overlap=120, top_k=4, min_score=0.805, api_url=http://localhost:8000, log_level=INFO, gemini_api_key_configured=True
+2026-10-03 15:33:56,958 INFO rag.embeddings - Modelo de embeddings 'intfloat/multilingual-e5-small' cargado en 4.4 s
+2026-10-03 15:34:12,952 INFO rag.llm - LLM gemini-3.1-flash-lite: 15.95 s, tokens 864/12, finish_reason=stop
 Respuesta:
 No encontré información sobre eso en los documentos cargados.
 
 ✘ Sin información en los documentos
-Fuentes:
-  [1] politica_vacaciones_y_permisos.md · score 0.871 · no citada
-  [2] politica_vacaciones_y_permisos.md · score 0.863 · no citada
-  [3] politica_vacaciones_y_permisos.md · score 0.863 · no citada
-  [4] politica_vacaciones_y_permisos.md · score 0.857 · no citada
-(modelo gemini-3.1-flash-lite · 10.79 s · recuperados 4, sobre MIN_SCORE=0.805: 4)
+(modelo gemini-3.1-flash-lite · 15.99 s · recuperados 4, sobre MIN_SCORE=0.805: 4)
 exit=0
 
 ==================================================================
 
-$ MIN_SCORE=0.805 python -m rag.cli ask ¿Cuál es la capital de Francia? --show-context
+$ MIN_SCORE=0.805 python -m rag.cli ask "¿Cuál es la capital de Francia?" --show-context
 2026-10-03 14:57:32,718 INFO rag.embeddings - Modelo de embeddings 'intfloat/multilingual-e5-small' cargado en 4.5 s
 Respuesta:
 No encontré información sobre eso en los documentos cargados.

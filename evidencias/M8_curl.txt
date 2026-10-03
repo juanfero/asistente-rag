@@ -1,5 +1,6 @@
 # Evidencia M8 — API levantada con: MIN_SCORE=0.805 uvicorn rag.api:app --workers 1 --port 8011
-# (puerto 8011 porque el 8000 estaba ocupado por otro servicio local; por defecto la API usa 8000)
+# (puerto 8011 porque el 8000 está ocupado por otro servicio local; por defecto la API usa 8000)
+# Los comandos se pueden copiar y pegar tal cual (ejecutar desde una carpeta con los archivos de ejemplo).
 
 ### 1. Estado del servicio
 $ curl http://localhost:8011/health
@@ -37,7 +38,7 @@ HTTP 200
 ]
 
 ### 3. Pregunta contestable (Q2)
-$ curl -X POST http://localhost:8011/ask -H Content-Type: application/json -d {"question":"¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?"}
+$ curl -X POST http://localhost:8011/ask -H 'Content-Type: application/json' -d '{"question": "¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?"}'
 HTTP 200
 {
     "question": "¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?",
@@ -102,13 +103,13 @@ HTTP 200
         }
     ],
     "model": "gemini-3.1-flash-lite",
-    "latency_s": 6.5368234570014465,
+    "latency_s": 12.545547802001238,
     "retrieved": 4,
     "llm_called": true
 }
 
 ### 4. Pregunta parcial (Q4)
-$ curl -X POST http://localhost:8011/ask -H Content-Type: application/json -d {"question":"¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?"}
+$ curl -X POST http://localhost:8011/ask -H 'Content-Type: application/json' -d '{"question": "¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?"}'
 HTTP 200
 {
     "question": "¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?",
@@ -164,56 +165,19 @@ HTTP 200
         }
     ],
     "model": "gemini-3.1-flash-lite",
-    "latency_s": 3.7418957959998806,
+    "latency_s": 12.290935624001577,
     "retrieved": 4,
     "llm_called": true
 }
 
-### 5. Pregunta sin respuesta en los documentos (Q8)
-$ curl -X POST http://localhost:8011/ask -H Content-Type: application/json -d {"question":"¿Cuántos días a la semana puedo trabajar remoto?"}
+### 5. Pregunta sin respuesta en los documentos (Q8) → grounded=false y sources=[]
+$ curl -X POST http://localhost:8011/ask -H 'Content-Type: application/json' -d '{"question": "¿Cuántos días a la semana puedo trabajar remoto?"}'
 HTTP 200
 {
     "question": "¿Cuántos días a la semana puedo trabajar remoto?",
     "answer": "No encontré información sobre eso en los documentos cargados.",
     "grounded": false,
-    "sources": [
-        {
-            "source": "politica_vacaciones_y_permisos.md",
-            "page": null,
-            "chunk_id": "85b63fae64bb4001",
-            "score": 0.8713106513023376,
-            "excerpt": "Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada año trabajado.\n\nLas vacaciones se pueden acumular hasta un **máximo de 2 periodos**. Al completar el segundo periodo acumulado, Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común ac",
-            "cited": false,
-            "index": 1
-        },
-        {
-            "source": "politica_vacaciones_y_permisos.md",
-            "page": null,
-            "chunk_id": "09e031c1ff082b16",
-            "score": 0.8629896640777588,
-            "excerpt": "- **Licencia de maternidad:** 18 semanas, según la ley colombiana.\n\nLas licencias se tramitan con Gestión Humana presentando el registro civil de nacimiento o la certificación médica correspondiente.\n\n## 5. Día de cumpleaños\n\nTodo colaborador tiene derecho a **un día libre por su cumpleaños**. Este ",
-            "cited": false,
-            "index": 2
-        },
-        {
-            "source": "politica_vacaciones_y_permisos.md",
-            "page": null,
-            "chunk_id": "ccf38692cf1bb922",
-            "score": 0.8627996444702148,
-            "excerpt": "4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda registrada en su historial.\n\n### 2.3 Fraccionamiento\n\nLas vacaciones se pueden fraccionar en varios bloques, pero **al menos uno de los bloques debe ser de mínimo 6 días hábiles** continuos. Los demás bloques ",
-            "cited": false,
-            "index": 3
-        },
-        {
-            "source": "politica_vacaciones_y_permisos.md",
-            "page": null,
-            "chunk_id": "47eb7a8678186cfd",
-            "score": 0.8572429418563843,
-            "excerpt": "Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato.\n\n### 2.2 Cómo solicitar vacaciones\n\n1. La solicitud se registra en el portal **NexaPeople**, en la opción \"Ausencias > Vacaciones\".\n2. Debe hacerse con un **mínimo de 15 días calendario d",
-            "cited": false,
-            "index": 4
-        }
-    ],
+    "sources": [],
     "context": [
         {
             "source": "politica_vacaciones_y_permisos.md",
@@ -253,13 +217,13 @@ HTTP 200
         }
     ],
     "model": "gemini-3.1-flash-lite",
-    "latency_s": 10.749338272999012,
+    "latency_s": 3.6454551570022886,
     "retrieved": 4,
     "llm_called": true
 }
 
 ### 6. Subida válida (.txt) → data/uploads/
-$ curl -X POST http://localhost:8011/documents -F files=@./horario_cafeteria.txt
+$ curl -X POST http://localhost:8011/documents -F 'files=@horario_cafeteria.txt'
 HTTP 200
 {
     "files_processed": 1,
@@ -271,7 +235,7 @@ HTTP 200
         "horario_cafeteria.txt"
     ],
     "skipped": [],
-    "duration_s": 0.040043639000941766
+    "duration_s": 0.037309032002667664
 }
 
 ### 7. Documentos tras la subida (origen corpus/upload)
@@ -301,7 +265,7 @@ HTTP 200
 ]
 
 ### 8. Subida .exe → 415
-$ curl -X POST http://localhost:8011/documents -F files=@./programa.exe
+$ curl -X POST http://localhost:8011/documents -F 'files=@programa.exe'
 HTTP 415
 {
     "error": "UNSUPPORTED_FILE_TYPE",
@@ -309,7 +273,7 @@ HTTP 415
 }
 
 ### 9. Subida con un nombre del corpus → 409
-$ curl -X POST http://localhost:8011/documents -F files=@./guia_onboarding_ti.txt
+$ curl -X POST http://localhost:8011/documents -F 'files=@guia_onboarding_ti.txt'
 HTTP 409
 {
     "error": "DUPLICATE_SOURCE",
@@ -317,7 +281,7 @@ HTTP 409
 }
 
 ### 10. Pregunta vacía → 422
-$ curl -X POST http://localhost:8011/ask -H Content-Type: application/json -d {"question":""}
+$ curl -X POST http://localhost:8011/ask -H 'Content-Type: application/json' -d '{"question": ""}'
 HTTP 422
 {
     "error": "VALIDATION_ERROR",
@@ -325,7 +289,7 @@ HTTP 422
 }
 
 ### 11. Borrar la subida de prueba (índice + disco)
-$ curl -X DELETE http://localhost:8011/documents/horario_cafeteria.txt?delete_file=true
+$ curl -X DELETE 'http://localhost:8011/documents/horario_cafeteria.txt?delete_file=true'
 HTTP 200
 {
     "source": "horario_cafeteria.txt",
@@ -334,7 +298,7 @@ HTTP 200
 }
 
 ### 12. Intentar borrar del disco un archivo del corpus → 403
-$ curl -X DELETE http://localhost:8011/documents/guia_onboarding_ti.txt?delete_file=true
+$ curl -X DELETE 'http://localhost:8011/documents/guia_onboarding_ti.txt?delete_file=true'
 HTTP 403
 {
     "error": "PROTECTED_SOURCE",
