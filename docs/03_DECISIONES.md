@@ -155,3 +155,30 @@ Formato: contexto → decisión → alternativas → consecuencias. Una entrada 
     e. Cualquier otro 429 → `LLMRateLimitError` con el mensaje: "Límite de solicitudes de Gemini alcanzado. Espera un minuto e intenta de nuevo. Si el error persiste, es posible que se hayan agotado los créditos: cambia GEMINI_API_KEY en .env y reinicia."
     `quota` y `billing` **no** se usan: Gemini incluye "You exceeded your current quota, please check your plan and billing details" en casi todos sus 429, también en los de límite por minuto (**corrección del 2026-10-03**: la regla d original usaba `billing` y clasificaba mal un 429 por minuto sin `details`). Se clasifica después de los reintentos del SDK (`max_retries=2`).
   - Pruebas que llaman a Gemini: marcador `llm`, opt-in con `RUN_LLM=1` (sin costo por defecto).
+
+## ADR-011 — API: formato único de errores y subidas fuera del corpus
+- **Fecha:** 2026-10-03 · **Estado:** Aceptada
+- **Contexto:** la API debe exponer errores comprensibles y estables para la UI (M9) y no debe modificar el corpus versionado `data/docs/` (riesgo H9 de M0).
+- **Decisión:**
+  - Todas las respuestas de error usan `{"error": "<CODIGO>", "detail": "<mensaje en español>"}`, incluidas las de validación (422) y rutas inexistentes (404). Mapeo:
+
+| Situación | HTTP | `error` |
+|---|---|---|
+| Validación del body (pregunta vacía, > 1.000 car., `top_k` fuera de 1–20) | 422 | `VALIDATION_ERROR` |
+| Nombre de archivo inválido | 400 | `INVALID_FILENAME` |
+| Borrar del disco un archivo del corpus | 403 | `PROTECTED_SOURCE` |
+| Documento inexistente / ruta inexistente | 404 | `DOCUMENT_NOT_FOUND` / `NOT_FOUND` |
+| Índice vacío (`EmptyIndexError`) | 409 | `EMPTY_INDEX` |
+| Índice creado con otro modelo (`EmbeddingModelMismatchError`) | 409 | `INDEX_MODEL_MISMATCH` |
+| Subida con el nombre de un archivo del corpus o repetida en la petición | 409 | `DUPLICATE_SOURCE` |
+| Archivo > 10 MB | 413 | `FILE_TOO_LARGE` |
+| Extensión no soportada / contenido que no corresponde (PDF sin `%PDF`, binario como .txt) | 415 | `UNSUPPORTED_FILE_TYPE` / `INVALID_CONTENT` |
+| `LLMRateLimitError` | 429 (+ `Retry-After: 60`) | `LLM_RATE_LIMIT` |
+| Otro `LLMError` | 502 | `LLM_ERROR` |
+| `LLMQuotaExhaustedError` | 503 | `LLM_QUOTA_EXHAUSTED` |
+| `LLMAuthError` (key inválida o ausente) | 503 | `LLM_AUTH_ERROR` |
+| Cualquier excepción no controlada | 500 | `INTERNAL_ERROR` (mensaje genérico; el detalle solo va al log) |
+
+  - Las subidas van a `data/uploads/` (ignorado por git); `data/docs/` es el corpus congelado y protegido (409 al reutilizar su nombre, 403 al intentar borrarlo del disco). Se valida el contenido además de la extensión.
+  - Un solo worker (`--workers 1`) con un `threading.Lock` para las escrituras: Chroma local no admite escritores concurrentes entre procesos.
+- **Consecuencias:** la UI puede reaccionar por código (`LLM_QUOTA_EXHAUSTED` → pedir cambiar la key, `LLM_RATE_LIMIT` → esperar `Retry-After`); los errores internos nunca exponen detalles al cliente. Escalar a varios workers requeriría un vector store servidor (Chroma server / pgvector) — ver Mejoras futuras.

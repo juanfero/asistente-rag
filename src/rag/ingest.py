@@ -25,6 +25,7 @@ class IngestReport:
     total_in_store: int = 0
     sources: list[str] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)  # "archivo: motivo"
+    skipped_files: list[str] = field(default_factory=list)  # nombres de los omitidos
     duration_s: float = 0.0
 
 
@@ -66,6 +67,7 @@ def _skip(report: IngestReport, path: Path, reason: str) -> None:
     """Cuenta un archivo omitido y lo avisa en el log."""
     report.files_skipped += 1
     report.skipped.append(f"{path.name}: {reason}")
+    report.skipped_files.append(path.name)
     logger.warning("Se omite %s: %s", path, reason)
 
 

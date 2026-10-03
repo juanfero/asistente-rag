@@ -19,6 +19,10 @@ htmlcov/
 data/chroma/*
 !data/chroma/.gitkeep
 
+# Archivos subidos por la API (fuera del corpus versionado data/docs)
+data/uploads/*
+!data/uploads/.gitkeep
+
 # Enunciado de la prueba técnica: solo local (repositorio público)
 docs/Prueba_Tecnica_AI_Developer_Engineer_Junior_IC7.docx
 docs/caso_tecnico_original.md

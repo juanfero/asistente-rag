@@ -91,6 +91,7 @@ def test_skips_unsupported(store, settings: Settings, tmp_path: Path) -> None:
     assert report.files_processed == 1
     assert report.files_skipped == 2
     assert any("informe.docx" in s and "no soportado" in s for s in report.skipped)
+    assert sorted(report.skipped_files) == ["datos.xlsx", "informe.docx"]
 
 
 def test_skips_empty_and_textless_pdf(store, settings: Settings, tmp_path: Path) -> None:

@@ -33,6 +33,6 @@ git log --all -p | python scripts/secret_scan.py --stdin   # historial sin clave
 ruff check src tests && ruff format --check src tests
 python -m rag.cli ingest data/docs      # desde M5
 python -m rag.cli ask "pregunta"        # desde M7
-uvicorn rag.api:app --reload            # desde M8
+uvicorn rag.api:app --workers 1         # desde M8 (1 worker: Chroma local) → /docs
 streamlit run src/rag/ui_streamlit.py   # desde M9
 ```

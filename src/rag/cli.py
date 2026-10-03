@@ -8,7 +8,7 @@ from pathlib import Path
 from rag.config import Settings, get_settings, log_effective_settings
 from rag.embeddings import Embedder
 from rag.ingest import IngestReport, build_store, ingest_paths
-from rag.llm import LLMClient, LLMError, LLMResult, get_llm
+from rag.llm import LazyLLM, LLMClient, LLMError, get_llm
 from rag.logging_conf import setup_logging
 from rag.rag_engine import RAGAnswer, RAGEngine
 from rag.vectorstore import ChromaVectorStore, EmbeddingModelMismatchError, reset_collection
@@ -37,19 +37,6 @@ def _parser() -> argparse.ArgumentParser:
     ask.add_argument("--top-k", type=int, default=None, help="fragmentos a recuperar")
     ask.add_argument("--show-context", action="store_true", help="muestra el contexto usado")
     return parser
-
-
-class _LazyLLM:
-    """Crea el cliente LLM solo si se necesita (las preguntas cortadas por el umbral no lo usan)."""
-
-    def __init__(self, factory: Callable[[], LLMClient]) -> None:
-        self._factory = factory
-        self._client: LLMClient | None = None
-
-    def generate(self, system: str, user: str) -> LLMResult:
-        if self._client is None:
-            self._client = self._factory()
-        return self._client.generate(system, user)
 
 
 def _print_answer(answer: RAGAnswer, settings: Settings, show_context: bool) -> None:
@@ -84,7 +71,7 @@ def _run_ask(
     args: argparse.Namespace, store: ChromaVectorStore, settings: Settings, llm: LLMClient | None
 ) -> int:
     """Ejecuta `ask` y traduce los errores a códigos de salida (0/1/2) sin traceback."""
-    engine = RAGEngine(store, llm or _LazyLLM(lambda: get_llm(settings)), settings)
+    engine = RAGEngine(store, llm or LazyLLM(lambda: get_llm(settings)), settings)
     try:
         answer = engine.ask(args.question, top_k=args.top_k)
     except LLMError as exc:

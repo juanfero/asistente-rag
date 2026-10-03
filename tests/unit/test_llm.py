@@ -116,8 +116,9 @@ def respond(status: int, body, headers: dict | None = None):
 
 def test_missing_key() -> None:
     """M6-01: sin API key → LLMError con mensaje claro."""
-    with pytest.raises(LLMError, match="Falta GEMINI_API_KEY"):
+    with pytest.raises(LLMAuthError, match="Falta GEMINI_API_KEY") as exc:
         GeminiClient(Settings(_env_file=None))
+    assert isinstance(exc.value, LLMError)
 
 
 def test_request_payload(settings: Settings) -> None:
@@ -360,3 +361,20 @@ def test_other_400_is_generic(settings: Settings) -> None:
     with pytest.raises(LLMError, match="HTTP 400") as exc:
         make_client(settings, handler).generate("s", "u")
     assert not isinstance(exc.value, LLMAuthError)
+
+
+def test_lazy_llm_creates_client_on_first_use() -> None:
+    """LazyLLM no crea el cliente hasta la primera generación y lo reutiliza."""
+    from rag.llm import LazyLLM
+
+    created: list[int] = []
+
+    def factory() -> FakeLLM:
+        created.append(1)
+        return FakeLLM(lambda s, u: "ok")
+
+    lazy = LazyLLM(factory)
+    assert created == []
+    assert lazy.generate("s", "u").text == "ok"
+    lazy.generate("s", "u")
+    assert created == [1]

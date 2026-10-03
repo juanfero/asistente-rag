@@ -112,7 +112,7 @@ class GeminiClient:
     def __init__(self, settings: Settings, client: Any | None = None) -> None:
         key = settings.gemini_api_key.get_secret_value() if settings.gemini_api_key else ""
         if not key:
-            raise LLMError(
+            raise LLMAuthError(
                 "Falta GEMINI_API_KEY. Defínela en el archivo .env de la raíz del proyecto "
                 "(ver .env.example)."
             )
@@ -205,6 +205,20 @@ class FakeLLM:
             latency_s=0.0,
             finish_reason="stop",
         )
+
+
+class LazyLLM:
+    """Crea el cliente LLM solo cuando se usa (preguntas cortadas por el umbral no lo necesitan)."""
+
+    def __init__(self, factory: Callable[[], LLMClient]) -> None:
+        self._factory = factory
+        self._client: LLMClient | None = None
+
+    def generate(self, system: str, user: str) -> LLMResult:
+        """Instancia el cliente en el primer uso y delega."""
+        if self._client is None:
+            self._client = self._factory()
+        return self._client.generate(system, user)
 
 
 def get_llm(settings: Settings) -> GeminiClient:

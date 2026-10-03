@@ -1,0 +1,357 @@
+# Evidencia M8 — API levantada con: MIN_SCORE=0.805 uvicorn rag.api:app --workers 1 --port 8011
+# (puerto 8011 porque el 8000 estaba ocupado por otro servicio local; por defecto la API usa 8000)
+
+### 1. Estado del servicio
+$ curl http://localhost:8011/health
+HTTP 200
+{
+    "status": "ok",
+    "llm_model": "gemini-3.1-flash-lite",
+    "llm_configured": true,
+    "embedding_model": "intfloat/multilingual-e5-small",
+    "chunks": 16,
+    "documents": 3,
+    "min_score": 0.805,
+    "top_k": 4
+}
+
+### 2. Documentos indexados
+$ curl http://localhost:8011/documents
+HTTP 200
+[
+    {
+        "source": "guia_onboarding_ti.txt",
+        "chunks": 6,
+        "origin": "corpus"
+    },
+    {
+        "source": "manual_reembolso_gastos.pdf",
+        "chunks": 4,
+        "origin": "corpus"
+    },
+    {
+        "source": "politica_vacaciones_y_permisos.md",
+        "chunks": 6,
+        "origin": "corpus"
+    }
+]
+
+### 3. Pregunta contestable (Q2)
+$ curl -X POST http://localhost:8011/ask -H Content-Type: application/json -d {"question":"¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?"}
+HTTP 200
+{
+    "question": "¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?",
+    "answer": "El tope diario de alimentación para viajes nacionales es de COP 120.000 [1] y para viajes internacionales es de USD 90 [2].",
+    "grounded": true,
+    "sources": [
+        {
+            "source": "manual_reembolso_gastos.pdf",
+            "page": 1,
+            "chunk_id": "2e1c0c01aca43fc2",
+            "score": 0.866706907749176,
+            "excerpt": "colaborador.\n- Todos los soportes deben ser factura electrónica a nombre de Nexa Logística S.A.S., NIT 900.123.456-7.\nNo se aceptan recibos de caja menor ni cuentas de cobro sin factura.\n3. Topes diarios de viáticos nacionales\n- Alimentación: COP 120.000 por día.\n- Transporte local: COP 80.000 por d",
+            "cited": true,
+            "index": 1
+        },
+        {
+            "source": "manual_reembolso_gastos.pdf",
+            "page": 2,
+            "chunk_id": "6a651032c66c5372",
+            "score": 0.8631850481033325,
+            "excerpt": "4. Viajes internacionales\n- Para viajes internacionales el tope de alimentación es de USD 90 por día.\n- El hospedaje internacional se reserva a través del área Administrativa según las tarifas del convenio\nvigente.\n5. Anticipos\nSe pueden solicitar anticipos por un máximo del 70% del presupuesto tota",
+            "cited": true,
+            "index": 2
+        }
+    ],
+    "context": [
+        {
+            "source": "manual_reembolso_gastos.pdf",
+            "page": 1,
+            "chunk_id": "2e1c0c01aca43fc2",
+            "score": 0.866706907749176,
+            "excerpt": "colaborador.\n- Todos los soportes deben ser factura electrónica a nombre de Nexa Logística S.A.S., NIT 900.123.456-7.\nNo se aceptan recibos de caja menor ni cuentas de cobro sin factura.\n3. Topes diarios de viáticos nacionales\n- Alimentación: COP 120.000 por día.\n- Transporte local: COP 80.000 por d",
+            "cited": true,
+            "index": 1
+        },
+        {
+            "source": "manual_reembolso_gastos.pdf",
+            "page": 2,
+            "chunk_id": "6a651032c66c5372",
+            "score": 0.8631850481033325,
+            "excerpt": "4. Viajes internacionales\n- Para viajes internacionales el tope de alimentación es de USD 90 por día.\n- El hospedaje internacional se reserva a través del área Administrativa según las tarifas del convenio\nvigente.\n5. Anticipos\nSe pueden solicitar anticipos por un máximo del 70% del presupuesto tota",
+            "cited": true,
+            "index": 2
+        },
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "cbafcf878d3c42d4",
+            "score": 0.8130325078964233,
+            "excerpt": "# Política de Vacaciones y Permisos\n\n**Nexa Logística S.A.S.** · Gestión Humana\n**Versión:** 2.1 · **Vigente desde:** 2026-01-15 · **Código:** GH-POL-004\n\n> Documento ficticio para prueba técnica.\n\n## 1. Objetivo y alcance\n\nEsta política establece las reglas para el disfrute de vacaciones, permisos ",
+            "cited": false,
+            "index": 3
+        },
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "09e031c1ff082b16",
+            "score": 0.8107156753540039,
+            "excerpt": "- **Licencia de maternidad:** 18 semanas, según la ley colombiana.\n\nLas licencias se tramitan con Gestión Humana presentando el registro civil de nacimiento o la certificación médica correspondiente.\n\n## 5. Día de cumpleaños\n\nTodo colaborador tiene derecho a **un día libre por su cumpleaños**. Este ",
+            "cited": false,
+            "index": 4
+        }
+    ],
+    "model": "gemini-3.1-flash-lite",
+    "latency_s": 6.5368234570014465,
+    "retrieved": 4,
+    "llm_called": true
+}
+
+### 4. Pregunta parcial (Q4)
+$ curl -X POST http://localhost:8011/ask -H Content-Type: application/json -d {"question":"¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?"}
+HTTP 200
+{
+    "question": "¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?",
+    "answer": "Por matrimonio se conceden 5 días hábiles de permiso [1]. Los documentos no incluyen información sobre cómo se pagan las horas extra.",
+    "grounded": true,
+    "sources": [
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "6111b0d044917f4e",
+            "score": 0.8828743696212769,
+            "excerpt": "permisos se conceden sin descuento y se solicitan también en NexaPeople, adjuntando el soporte correspondiente:\n\n| Permiso | Duración | Soporte |\n|---|---|---|\n| Matrimonio | **5 días hábiles** | Registro civil de matrimonio |\n| Calamidad doméstica | **Hasta 5 días** | Soporte del evento (médico, fu",
+            "cited": true,
+            "index": 1
+        }
+    ],
+    "context": [
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "6111b0d044917f4e",
+            "score": 0.8828743696212769,
+            "excerpt": "permisos se conceden sin descuento y se solicitan también en NexaPeople, adjuntando el soporte correspondiente:\n\n| Permiso | Duración | Soporte |\n|---|---|---|\n| Matrimonio | **5 días hábiles** | Registro civil de matrimonio |\n| Calamidad doméstica | **Hasta 5 días** | Soporte del evento (médico, fu",
+            "cited": true,
+            "index": 1
+        },
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "09e031c1ff082b16",
+            "score": 0.8695928454399109,
+            "excerpt": "- **Licencia de maternidad:** 18 semanas, según la ley colombiana.\n\nLas licencias se tramitan con Gestión Humana presentando el registro civil de nacimiento o la certificación médica correspondiente.\n\n## 5. Día de cumpleaños\n\nTodo colaborador tiene derecho a **un día libre por su cumpleaños**. Este ",
+            "cited": false,
+            "index": 2
+        },
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "85b63fae64bb4001",
+            "score": 0.8531928062438965,
+            "excerpt": "Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada año trabajado.\n\nLas vacaciones se pueden acumular hasta un **máximo de 2 periodos**. Al completar el segundo periodo acumulado, Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común ac",
+            "cited": false,
+            "index": 3
+        },
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "ccf38692cf1bb922",
+            "score": 0.8512148857116699,
+            "excerpt": "4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda registrada en su historial.\n\n### 2.3 Fraccionamiento\n\nLas vacaciones se pueden fraccionar en varios bloques, pero **al menos uno de los bloques debe ser de mínimo 6 días hábiles** continuos. Los demás bloques ",
+            "cited": false,
+            "index": 4
+        }
+    ],
+    "model": "gemini-3.1-flash-lite",
+    "latency_s": 3.7418957959998806,
+    "retrieved": 4,
+    "llm_called": true
+}
+
+### 5. Pregunta sin respuesta en los documentos (Q8)
+$ curl -X POST http://localhost:8011/ask -H Content-Type: application/json -d {"question":"¿Cuántos días a la semana puedo trabajar remoto?"}
+HTTP 200
+{
+    "question": "¿Cuántos días a la semana puedo trabajar remoto?",
+    "answer": "No encontré información sobre eso en los documentos cargados.",
+    "grounded": false,
+    "sources": [
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "85b63fae64bb4001",
+            "score": 0.8713106513023376,
+            "excerpt": "Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada año trabajado.\n\nLas vacaciones se pueden acumular hasta un **máximo de 2 periodos**. Al completar el segundo periodo acumulado, Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común ac",
+            "cited": false,
+            "index": 1
+        },
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "09e031c1ff082b16",
+            "score": 0.8629896640777588,
+            "excerpt": "- **Licencia de maternidad:** 18 semanas, según la ley colombiana.\n\nLas licencias se tramitan con Gestión Humana presentando el registro civil de nacimiento o la certificación médica correspondiente.\n\n## 5. Día de cumpleaños\n\nTodo colaborador tiene derecho a **un día libre por su cumpleaños**. Este ",
+            "cited": false,
+            "index": 2
+        },
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "ccf38692cf1bb922",
+            "score": 0.8627996444702148,
+            "excerpt": "4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda registrada en su historial.\n\n### 2.3 Fraccionamiento\n\nLas vacaciones se pueden fraccionar en varios bloques, pero **al menos uno de los bloques debe ser de mínimo 6 días hábiles** continuos. Los demás bloques ",
+            "cited": false,
+            "index": 3
+        },
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "47eb7a8678186cfd",
+            "score": 0.8572429418563843,
+            "excerpt": "Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato.\n\n### 2.2 Cómo solicitar vacaciones\n\n1. La solicitud se registra en el portal **NexaPeople**, en la opción \"Ausencias > Vacaciones\".\n2. Debe hacerse con un **mínimo de 15 días calendario d",
+            "cited": false,
+            "index": 4
+        }
+    ],
+    "context": [
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "85b63fae64bb4001",
+            "score": 0.8713106513023376,
+            "excerpt": "Cada colaborador tiene derecho a **15 días hábiles** de vacaciones remuneradas por cada año trabajado.\n\nLas vacaciones se pueden acumular hasta un **máximo de 2 periodos**. Al completar el segundo periodo acumulado, Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común ac",
+            "cited": false,
+            "index": 1
+        },
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "09e031c1ff082b16",
+            "score": 0.8629896640777588,
+            "excerpt": "- **Licencia de maternidad:** 18 semanas, según la ley colombiana.\n\nLas licencias se tramitan con Gestión Humana presentando el registro civil de nacimiento o la certificación médica correspondiente.\n\n## 5. Día de cumpleaños\n\nTodo colaborador tiene derecho a **un día libre por su cumpleaños**. Este ",
+            "cited": false,
+            "index": 2
+        },
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "ccf38692cf1bb922",
+            "score": 0.8627996444702148,
+            "excerpt": "4. Una vez aprobada, el colaborador recibe la confirmación por correo y la solicitud queda registrada en su historial.\n\n### 2.3 Fraccionamiento\n\nLas vacaciones se pueden fraccionar en varios bloques, pero **al menos uno de los bloques debe ser de mínimo 6 días hábiles** continuos. Los demás bloques ",
+            "cited": false,
+            "index": 3
+        },
+        {
+            "source": "politica_vacaciones_y_permisos.md",
+            "page": null,
+            "chunk_id": "47eb7a8678186cfd",
+            "score": 0.8572429418563843,
+            "excerpt": "Gestión Humana programará de oficio el disfrute del periodo más antiguo, de común acuerdo con el jefe inmediato.\n\n### 2.2 Cómo solicitar vacaciones\n\n1. La solicitud se registra en el portal **NexaPeople**, en la opción \"Ausencias > Vacaciones\".\n2. Debe hacerse con un **mínimo de 15 días calendario d",
+            "cited": false,
+            "index": 4
+        }
+    ],
+    "model": "gemini-3.1-flash-lite",
+    "latency_s": 10.749338272999012,
+    "retrieved": 4,
+    "llm_called": true
+}
+
+### 6. Subida válida (.txt) → data/uploads/
+$ curl -X POST http://localhost:8011/documents -F files=@./horario_cafeteria.txt
+HTTP 200
+{
+    "files_processed": 1,
+    "files_skipped": 0,
+    "documents": 1,
+    "chunks_added": 1,
+    "total_in_store": 17,
+    "sources": [
+        "horario_cafeteria.txt"
+    ],
+    "skipped": [],
+    "duration_s": 0.040043639000941766
+}
+
+### 7. Documentos tras la subida (origen corpus/upload)
+$ curl http://localhost:8011/documents
+HTTP 200
+[
+    {
+        "source": "guia_onboarding_ti.txt",
+        "chunks": 6,
+        "origin": "corpus"
+    },
+    {
+        "source": "horario_cafeteria.txt",
+        "chunks": 1,
+        "origin": "upload"
+    },
+    {
+        "source": "manual_reembolso_gastos.pdf",
+        "chunks": 4,
+        "origin": "corpus"
+    },
+    {
+        "source": "politica_vacaciones_y_permisos.md",
+        "chunks": 6,
+        "origin": "corpus"
+    }
+]
+
+### 8. Subida .exe → 415
+$ curl -X POST http://localhost:8011/documents -F files=@./programa.exe
+HTTP 415
+{
+    "error": "UNSUPPORTED_FILE_TYPE",
+    "detail": "Tipo de archivo no soportado: 'programa.exe'. Usa .txt, .md o .pdf."
+}
+
+### 9. Subida con un nombre del corpus → 409
+$ curl -X POST http://localhost:8011/documents -F files=@./guia_onboarding_ti.txt
+HTTP 409
+{
+    "error": "DUPLICATE_SOURCE",
+    "detail": "'guia_onboarding_ti.txt' ya existe en el corpus (data/docs). Renombra el archivo."
+}
+
+### 10. Pregunta vacía → 422
+$ curl -X POST http://localhost:8011/ask -H Content-Type: application/json -d {"question":""}
+HTTP 422
+{
+    "error": "VALIDATION_ERROR",
+    "detail": "Petición inválida: 'question' no puede estar vacío."
+}
+
+### 11. Borrar la subida de prueba (índice + disco)
+$ curl -X DELETE http://localhost:8011/documents/horario_cafeteria.txt?delete_file=true
+HTTP 200
+{
+    "source": "horario_cafeteria.txt",
+    "deleted_chunks": 1,
+    "file_deleted": true
+}
+
+### 12. Intentar borrar del disco un archivo del corpus → 403
+$ curl -X DELETE http://localhost:8011/documents/guia_onboarding_ti.txt?delete_file=true
+HTTP 403
+{
+    "error": "PROTECTED_SOURCE",
+    "detail": "'guia_onboarding_ti.txt' pertenece al corpus (data/docs) y no se puede borrar del disco. Puedes quitarlo del índice sin delete_file."
+}
+
+### 13. Estado final
+$ curl http://localhost:8011/health
+HTTP 200
+{
+    "status": "ok",
+    "llm_model": "gemini-3.1-flash-lite",
+    "llm_configured": true,
+    "embedding_model": "intfloat/multilingual-e5-small",
+    "chunks": 16,
+    "documents": 3,
+    "min_score": 0.805,
+    "top_k": 4
+}
+

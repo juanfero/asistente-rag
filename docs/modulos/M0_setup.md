@@ -90,6 +90,6 @@ ruff check src tests && ruff format --check src tests
 - Fallo inicial de M0-06: `setup_logging()` usa `logging.basicConfig(force=True)`, que elimina el handler de `caplog`. El test ahora verifica por separado los registros capturados (`caplog`) y la salida real formateada por el handler del proyecto (`capsys`).
 - No se creó `.env` (sin key no se inventa ninguna); sin `.env` aplican los defaults.
 - Pruebas extra: `test_setup_logging` (aprobada por el autor) y, como complemento de M0-02/03/05, `test_env_file_is_read`, `test_get_settings_is_cached`, `test_valid_range_limits`.
-- **Riesgo anotado (H9, se resuelve en M8):** `POST /documents` guarda los archivos subidos en `data/docs/`, que está versionado como corpus; las subidas de prueba podrían terminar en git.
+- **Riesgo anotado (H9) — RESUELTO en M8:** las subidas van a `data/uploads/` (ignorado por git). Texto original: `POST /documents` guarda los archivos subidos en `data/docs/`, que está versionado como corpus; las subidas de prueba podrían terminar en git.
 
 **Modelo LLM fijado:** `gemini-3.1-flash-lite` (ADR-003, ADR-010). Antes: `grok-3-mini`, nunca verificado · **Versión de Python:** 3.10.12 (venv `.venv`)

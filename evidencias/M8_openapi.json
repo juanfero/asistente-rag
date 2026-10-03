@@ -1,0 +1,1017 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Asistente documental RAG",
+        "description": "Responde preguntas solo con los documentos internos, citando las fuentes.",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/health": {
+            "get": {
+                "tags": [
+                    "estado"
+                ],
+                "summary": "Health",
+                "description": "Estado del servicio, modelos configurados y tamaño del índice (no llama a Gemini).",
+                "operationId": "health_health_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HealthOut"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/documents": {
+            "get": {
+                "tags": [
+                    "documentos"
+                ],
+                "summary": "List Documents",
+                "description": "Fuentes indexadas con su nº de chunks y su origen (corpus o subida).",
+                "operationId": "list_documents_documents_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/DocumentOut"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Documents Documents Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "documentos"
+                ],
+                "summary": "Upload Documents",
+                "description": "Sube 1..n archivos a data/uploads/ y los ingiere (una subida previa con el mismo nombre\nse reemplaza; un nombre del corpus devuelve 409).",
+                "operationId": "upload_documents_documents_post",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Body_upload_documents_documents_post"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IngestReportOut"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ingest": {
+            "post": {
+                "tags": [
+                    "documentos"
+                ],
+                "summary": "Reingest",
+                "description": "Re-ingiere data/docs + data/uploads (con {\"reset\": true} vacía antes el índice).",
+                "operationId": "reingest_ingest_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "anyOf": [
+                                    {
+                                        "$ref": "#/components/schemas/IngestRequest"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "title": "Body"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IngestReportOut"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/documents/{source}": {
+            "delete": {
+                "tags": [
+                    "documentos"
+                ],
+                "summary": "Delete Document",
+                "description": "Quita un documento del índice; con ?delete_file=true borra también el archivo, solo si\nes una subida (los del corpus son protegidos → 403).",
+                "operationId": "delete_document_documents__source__delete",
+                "parameters": [
+                    {
+                        "name": "source",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Source"
+                        }
+                    },
+                    {
+                        "name": "delete_file",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false,
+                            "title": "Delete File"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeleteOut"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        },
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    },
+                    "409": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        },
+                        "description": "Conflict"
+                    },
+                    "413": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        },
+                        "description": "Request Entity Too Large"
+                    },
+                    "415": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        },
+                        "description": "Unsupported Media Type"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        },
+                        "description": "Unprocessable Entity"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        },
+                        "description": "Too Many Requests"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    },
+                    "502": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        },
+                        "description": "Bad Gateway"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        },
+                        "description": "Service Unavailable"
+                    }
+                }
+            }
+        },
+        "/ask": {
+            "post": {
+                "tags": [
+                    "preguntas"
+                ],
+                "summary": "Ask",
+                "description": "Responde solo con los documentos, citando fragmentos [n].",
+                "operationId": "ask_ask_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AskRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AskResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorOut"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AskRequest": {
+                "properties": {
+                    "question": {
+                        "type": "string",
+                        "maxLength": 1000,
+                        "minLength": 1,
+                        "title": "Question"
+                    },
+                    "top_k": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "maximum": 20.0,
+                                "minimum": 1.0
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Top K"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "question"
+                ],
+                "title": "AskRequest",
+                "description": "Pregunta (1–1.000 caracteres, sin contar espacios extremos) y top_k opcional."
+            },
+            "AskResponse": {
+                "properties": {
+                    "question": {
+                        "type": "string",
+                        "title": "Question"
+                    },
+                    "answer": {
+                        "type": "string",
+                        "title": "Answer"
+                    },
+                    "grounded": {
+                        "type": "boolean",
+                        "title": "Grounded"
+                    },
+                    "sources": {
+                        "items": {
+                            "$ref": "#/components/schemas/SourceOut"
+                        },
+                        "type": "array",
+                        "title": "Sources"
+                    },
+                    "context": {
+                        "items": {
+                            "$ref": "#/components/schemas/SourceOut"
+                        },
+                        "type": "array",
+                        "title": "Context"
+                    },
+                    "model": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Model"
+                    },
+                    "latency_s": {
+                        "type": "number",
+                        "title": "Latency S"
+                    },
+                    "retrieved": {
+                        "type": "integer",
+                        "title": "Retrieved"
+                    },
+                    "llm_called": {
+                        "type": "boolean",
+                        "title": "Llm Called"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "question",
+                    "answer",
+                    "grounded",
+                    "sources",
+                    "context",
+                    "model",
+                    "latency_s",
+                    "retrieved",
+                    "llm_called"
+                ],
+                "title": "AskResponse",
+                "description": "Respuesta del motor RAG."
+            },
+            "Body_upload_documents_documents_post": {
+                "properties": {
+                    "files": {
+                        "items": {
+                            "type": "string",
+                            "contentMediaType": "application/octet-stream"
+                        },
+                        "type": "array",
+                        "title": "Files",
+                        "description": "Archivos .txt, .md o .pdf (≤ 10 MB cada uno)"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "files"
+                ],
+                "title": "Body_upload_documents_documents_post"
+            },
+            "DeleteOut": {
+                "properties": {
+                    "source": {
+                        "type": "string",
+                        "title": "Source"
+                    },
+                    "deleted_chunks": {
+                        "type": "integer",
+                        "title": "Deleted Chunks"
+                    },
+                    "file_deleted": {
+                        "type": "boolean",
+                        "title": "File Deleted"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "source",
+                    "deleted_chunks",
+                    "file_deleted"
+                ],
+                "title": "DeleteOut",
+                "description": "Resultado de eliminar un documento."
+            },
+            "DocumentOut": {
+                "properties": {
+                    "source": {
+                        "type": "string",
+                        "title": "Source"
+                    },
+                    "chunks": {
+                        "type": "integer",
+                        "title": "Chunks"
+                    },
+                    "origin": {
+                        "type": "string",
+                        "enum": [
+                            "corpus",
+                            "upload",
+                            "desconocido"
+                        ],
+                        "title": "Origin"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "source",
+                    "chunks",
+                    "origin"
+                ],
+                "title": "DocumentOut",
+                "description": "Fuente indexada con su nº de chunks y su origen."
+            },
+            "ErrorOut": {
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "title": "Error"
+                    },
+                    "detail": {
+                        "type": "string",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "error",
+                    "detail"
+                ],
+                "title": "ErrorOut",
+                "description": "Formato único de error."
+            },
+            "HealthOut": {
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "ok",
+                            "index_model_mismatch"
+                        ],
+                        "title": "Status"
+                    },
+                    "llm_model": {
+                        "type": "string",
+                        "title": "Llm Model"
+                    },
+                    "llm_configured": {
+                        "type": "boolean",
+                        "title": "Llm Configured"
+                    },
+                    "embedding_model": {
+                        "type": "string",
+                        "title": "Embedding Model"
+                    },
+                    "chunks": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Chunks"
+                    },
+                    "documents": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Documents"
+                    },
+                    "min_score": {
+                        "type": "number",
+                        "title": "Min Score"
+                    },
+                    "top_k": {
+                        "type": "integer",
+                        "title": "Top K"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "status",
+                    "llm_model",
+                    "llm_configured",
+                    "embedding_model",
+                    "chunks",
+                    "documents",
+                    "min_score",
+                    "top_k"
+                ],
+                "title": "HealthOut",
+                "description": "Estado del servicio (no llama a Gemini)."
+            },
+            "IngestReportOut": {
+                "properties": {
+                    "files_processed": {
+                        "type": "integer",
+                        "title": "Files Processed"
+                    },
+                    "files_skipped": {
+                        "type": "integer",
+                        "title": "Files Skipped"
+                    },
+                    "documents": {
+                        "type": "integer",
+                        "title": "Documents"
+                    },
+                    "chunks_added": {
+                        "type": "integer",
+                        "title": "Chunks Added"
+                    },
+                    "total_in_store": {
+                        "type": "integer",
+                        "title": "Total In Store"
+                    },
+                    "sources": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Sources"
+                    },
+                    "skipped": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Skipped"
+                    },
+                    "duration_s": {
+                        "type": "number",
+                        "title": "Duration S"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "files_processed",
+                    "files_skipped",
+                    "documents",
+                    "chunks_added",
+                    "total_in_store",
+                    "sources",
+                    "skipped",
+                    "duration_s"
+                ],
+                "title": "IngestReportOut",
+                "description": "Reporte de ingesta."
+            },
+            "IngestRequest": {
+                "properties": {
+                    "reset": {
+                        "type": "boolean",
+                        "title": "Reset",
+                        "default": false
+                    }
+                },
+                "type": "object",
+                "title": "IngestRequest",
+                "description": "Opciones de re-ingesta."
+            },
+            "SourceOut": {
+                "properties": {
+                    "source": {
+                        "type": "string",
+                        "title": "Source"
+                    },
+                    "page": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Page"
+                    },
+                    "chunk_id": {
+                        "type": "string",
+                        "title": "Chunk Id"
+                    },
+                    "score": {
+                        "type": "number",
+                        "title": "Score"
+                    },
+                    "excerpt": {
+                        "type": "string",
+                        "title": "Excerpt"
+                    },
+                    "cited": {
+                        "type": "boolean",
+                        "title": "Cited"
+                    },
+                    "index": {
+                        "type": "integer",
+                        "title": "Index"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "source",
+                    "page",
+                    "chunk_id",
+                    "score",
+                    "excerpt",
+                    "cited",
+                    "index"
+                ],
+                "title": "SourceOut",
+                "description": "Fragmento usado como contexto, con su número [n] en el prompt."
+            }
+        }
+    }
+}
