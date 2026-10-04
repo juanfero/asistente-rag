@@ -62,7 +62,7 @@ Validar capacidad técnica, criterio de solución, claridad de comunicación y *
 | README claro | `README.md` |
 | Evidencia de ejecución | `evidencias/` (capturas, logs, salida de tests) |
 | Archivo de preguntas de prueba y resultados | `evaluacion/resultados.md` + `evaluacion/resultados.json` |
-| Video ≤ 5 min | Enlace en README; guion en `docs/05_GUION_VIDEO.md` |
+| Video ≤ 5 min | [Google Drive](https://drive.google.com/file/d/1qhfLlaM9QNFB3tKux28SSc074hpVVYcQ/view?usp=sharing) (enlazado en el README); guion en `docs/05_GUION_VIDEO.md` |
 | Explicación del uso de herramientas AI | `docs/04_USO_AI_ASSISTED.md` |
 
 ### 3.3 Fuera de alcance (prototipo)

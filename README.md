@@ -528,6 +528,6 @@ asistente-rag/
 
 ## Video
 
-**Video de la solución (≤ 5 min):** [VIDEO_URL](VIDEO_URL)
+**Video de la solución (≤ 5 min):** [ver en Google Drive](https://drive.google.com/file/d/1qhfLlaM9QNFB3tKux28SSc074hpVVYcQ/view?usp=sharing)
 
 Problema y solución, arquitectura, cómo se eligió el modelo de embeddings, demo en la interfaz (pregunta contestable, parcial y sin respuesta; contexto de depuración; subida de un documento nuevo), API, pruebas y evaluación, uso de IA, limitaciones y mejoras. Guion: [`docs/05_GUION_VIDEO.md`](docs/05_GUION_VIDEO.md).

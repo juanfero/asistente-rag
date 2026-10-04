@@ -1,6 +1,6 @@
 # M11 — Documentación final y entregables
 
-**Estado:** ✅ Completado (M11-05: falta solo pegar el enlace del video) · **Estimado:** 3.5 h · **Depende de:** M0–M10 · **Requisitos:** R10, R12 + sección 5
+**Estado:** ✅ Completado · **Estimado:** 3.5 h · **Depende de:** M0–M10 · **Requisitos:** R10, R12 + sección 5
 
 ## Objetivo
 Dejar el repositorio listo para entregar: README completo según la sección 4.5, evidencias, explicación del uso de AI y video de ≤ 5 min.
@@ -45,7 +45,7 @@ OCR (Tesseract) y soporte DOCX; búsqueda híbrida (BM25 + vectorial) y *re-rank
 - [x] README claro — `README.md` (8 secciones de 4.5 + arquitectura, evaluación, embeddings, seguridad, video)
 - [x] Evidencia de ejecución — `evidencias/` (índice en `evidencias/README.md`)
 - [x] Archivo con preguntas de prueba y resultados — `evaluacion/preguntas.yaml`, `evaluacion/resultados.md`
-- [ ] Video ≤ 5 min — grabado por el autor; falta el enlace en el README (sección *Video*)
+- [x] Video ≤ 5 min — Google Drive, enlazado en el README (sección *Video*)
 - [x] Explicación del uso de herramientas AI-assisted development — `docs/04_USO_AI_ASSISTED.md`
 
 ## Registro de ejecución
@@ -58,6 +58,7 @@ OCR (Tesseract) y soporte DOCX; búsqueda híbrida (BM25 + vectorial) y *re-rank
 | 2026-10-04 | `pytest -m "not integration" --cov=rag --cov-fail-under=80` (G) | 98,33 % | `evidencias/M11_coverage.txt`; `ui_streamlit.py` excluido vía `[tool.coverage.run] omit` en `pyproject.toml` |
 | 2026-10-04 | Seguridad final (H) | 0 coincidencias | `evidencias/M11_seguridad.txt`: historial sin claves, `.env`/`data/chroma`/`data/uploads` ignorados (solo `.gitkeep` versionados), 0 rutas locales en evidencias/docs, hook instalado, `test_no_secrets` 17 passed |
 | 2026-10-04 | `evidencias/README.md` (I) y horas por módulo en `BITACORA.md` (J) | OK | Una línea por archivo; plan 31 h vs ≈7,8 h en sesión |
+| 2026-10-04 | Enlace del video en el README + tag `v1.0.0` | OK | Video del autor en Google Drive (acceso con el enlace) |
 | 2026-10-04 | `pytest -m "not integration" -q` y ruff | 392 passed, 12 deselected · All checks passed! | `evidencias/M11_pytest_ruff.txt` |
 
-**Estado de criterios:** M11-01 ✅ (`test_readme_sections`) · M11-02 ✅ (instalación desde cero) · M11-03 ✅ (392 verdes, cobertura 98 %) · M11-04 ✅ · M11-05 ⏸ (video grabado; falta el enlace) · M11-06 ✅.
+**Estado de criterios:** M11-01 ✅ (`test_readme_sections`) · M11-02 ✅ (instalación desde cero) · M11-03 ✅ (392 verdes, cobertura 98 %) · M11-04 ✅ · M11-05 ✅ (video en Google Drive, enlazado en el README) · M11-06 ✅.

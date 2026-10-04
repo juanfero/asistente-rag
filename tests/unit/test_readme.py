@@ -39,11 +39,12 @@ def test_readme_links_deliverables() -> None:
         assert f"]({target}" in README, target
         assert (PROJECT_ROOT / target).exists(), target
     assert "video" in HEADINGS
+    assert "VIDEO_URL" not in README  # el enlace real del video está publicado
 
 
 def test_readme_local_links_exist() -> None:
     """Todos los enlaces relativos del README apuntan a archivos o carpetas existentes."""
     links = re.findall(r"\]\(([^)#\s]+)(?:#[^)]*)?\)", README)
-    local = [link for link in links if not link.startswith(("http", "mailto:", "VIDEO_URL"))]
+    local = [link for link in links if not link.startswith(("http", "mailto:"))]
     missing = [link for link in local if not (PROJECT_ROOT / link).exists()]
     assert local and missing == []
