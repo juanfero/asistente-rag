@@ -15,7 +15,7 @@ Un cliente necesita un **asistente que responda preguntas usando únicamente la 
 2. Los divide en fragmentos (*chunking*).
 3. Genera **embeddings locales** con `sentence-transformers`.
 4. Los guarda en un **vector store local persistente (ChromaDB)**.
-5. Recibe una pregunta, recupera los fragmentos más similares y genera la respuesta con **Gemini** (ADR-010; antes Grok).
+5. Recibe una pregunta, recupera los fragmentos más similares y genera la respuesta con **Gemini** (`gemini-3.1-flash-lite`, ADR-010).
 6. Devuelve la respuesta **con referencia al documento y fragmento usados**, y responde explícitamente *"no encontré esa información en los documentos"* cuando no hay contexto suficiente.
 
 Se expone mediante una **API FastAPI** (núcleo) y una **interfaz Streamlit** (demo), más una **CLI** de consola.
@@ -75,31 +75,50 @@ Validar capacidad técnica, criterio de solución, claridad de comunicación y *
 | Componente | Elección | Motivo |
 |---|---|---|
 | Lenguaje | Python ≥ 3.10 (Linux) | Requerido por el caso |
-| LLM | **Gemini** (`gemini-3.1-flash-lite`) vía SDK `openai` con `base_url=https://generativelanguage.googleapis.com/v1beta/openai/` | Grok no funcionó para el candidato y Gemini sí (ADR-010); endpoint compatible con OpenAI → cliente simple y estándar. Modelo configurable en `.env` (`GEMINI_MODEL`) |
-| Embeddings | `sentence-transformers` — `intfloat/multilingual-e5-small` (384 dim, 512 tokens, prefijos `query: `/`passage: `) | Local, gratis, offline, multilingüe y entrenado para recuperar pasajes (ADR-009; reemplazó a `paraphrase-multilingual-MiniLM-L12-v2`) |
+| LLM | **Gemini** (`gemini-3.1-flash-lite`) vía SDK `openai` con `base_url=https://generativelanguage.googleapis.com/v1beta/openai/` | Endpoint compatible con OpenAI → cliente simple y estándar (ADR-010). Modelo configurable en `.env` (`GEMINI_MODEL`) |
+| Embeddings | `sentence-transformers` — `intfloat/multilingual-e5-small` (384 dim, 512 tokens, prefijos `query: `/`passage: `) | Local, gratis, offline, multilingüe y entrenado para recuperar pasajes; elegido tras comparar 3 variantes (ADR-009) |
 | Vector store | **ChromaDB** persistente (`data/chroma/`), métrica coseno | Local, persistente, guarda metadatos junto al vector |
 | Lectura PDF | `pypdf` | Ligero, extrae texto por página (permite citar página) |
-| Chunking | Implementación propia (recursivo por separadores + solapamiento) | Demuestra comprensión; sin dependencia pesada |
+| Chunking | Implementación propia (recursivo por separadores + solapamiento), **800/120 caracteres**, encabezados pegados a su contenido | Demuestra comprensión; sin dependencia pesada; 0 % de chunks truncados con e5 (ADR-004, ADR-008) |
+| Recuperación | `TOP_K=4`, `MIN_SCORE=0.805` (filtro de ruido) | Calibrado con preguntas legítimas, paráfrasis y fuera de dominio (ADR-005) |
 | API | FastAPI + Uvicorn | Opción recomendada por el caso; Swagger automático |
 | UI | Streamlit (consume la API) | Opción recomendada; ideal para el video |
 | Config | `pydantic-settings` + `.env` | Config tipada y centralizada |
-| Pruebas | `pytest`, `pytest-cov`; marcador `integration` para pruebas que llaman a Gemini o descargan modelos | Unitarias sin red/costo; integración opcional |
+| Pruebas | `pytest`, `pytest-cov`; marcador `integration` (modelos reales, Chroma) y `llm` (llama a Gemini; opt-in con `RUN_LLM=1`) | Unitarias sin red/costo; integración opcional |
 | Calidad | `ruff` (lint + format) | Rápido, estándar |
 
 > Por qué **no** LangChain/LlamaIndex: el caso evalúa *entender lo que hiciste*. Implementar el pipeline con piezas pequeñas y explícitas facilita explicarlo en el video y en la sustentación. Se documenta en `docs/03_DECISIONES.md` (ADR-001).
+
+### 4.1 Cambios respecto al plan original
+
+El plan del 2026-10-01 se ajustó con mediciones y problemas reales. Cada cambio quedó registrado como ADR en [`03_DECISIONES.md`](03_DECISIONES.md); los valores del plan solo se conservan allí como historial.
+
+| Tema | Plan original | Final | Motivo | ADR |
+|---|---|---|---|---|
+| LLM | Grok (xAI), `grok-3-mini` | Gemini `gemini-3.1-flash-lite` (endpoint compatible con OpenAI) | Grok no funcionó con la cuenta del autor; Gemini sí y reutiliza el SDK `openai` | ADR-010, ADR-003 |
+| Modelo de embeddings | `paraphrase-multilingual-MiniLM-L12-v2` (128 tokens) | `intfloat/multilingual-e5-small` (512 tokens, prefijos `query: `/`passage: `) | Comparación de 3 variantes: Recall@4 87,5 % → 100 %, MRR 0,833 → 1,000 | ADR-009 |
+| Tamaño de chunk | 800/120 → 500/80 en M3 (MiniLM truncaba el 62,5 %) | 800/120 | Con e5 no se trunca ningún chunk | ADR-004, ADR-009 |
+| Umbral `MIN_SCORE` | 0,35 (valor inicial sin calibrar) | 0,805, como filtro de ruido | e5 concentra los scores en 0,81–0,90: el umbral no separa las preguntas del dominio sin respuesta; esa abstención la decide el LLM | ADR-005 |
+| Subidas por la API | En `data/docs/` | En `data/uploads/` (ignorado por git) | El corpus versionado queda congelado como verdad de la evaluación | ADR-011 |
+| Errores de la API | Sin definir | Formato único `{"error","detail"}` con códigos por caso | Errores claros y consistentes en API y UI | ADR-011 |
+| Pruebas con costo | Marcador `integration` | `integration` (sin costo) + `llm` (opt-in con `RUN_LLM=1`) | Evitar gastar créditos por accidente | ADR-010 |
+| PyTorch | Sin especificar | Solo CPU | Instalación liviana, sin paquetes CUDA | ADR-006 |
+| `GET /stats` | Previsto en M8 | Eliminado | `/health` da el conteo y `GET /documents` el detalle | — (M0) |
 
 ## 5. Arquitectura
 
 ```
                 ┌───────────────────────── INGESTA ─────────────────────────┐
  data/docs/     │                                                           │
+ data/uploads/  │                                                           │
  .txt .md .pdf ─┼─► loaders.py ─► chunking.py ─► embeddings.py ─► vectorstore.py ──► data/chroma/
-                │   (Document)    (Chunk +        (vectores        (Chroma upsert     (persistente)
+                │   (Document)    (Chunk 800/120  (vectores        (Chroma upsert     (persistente)
                 │                  metadatos)      384-d)           ids estables)
                 └───────────────────────────────────────────────────────────┘
 
                 ┌───────────────────────── CONSULTA ────────────────────────┐
  Pregunta ──────┼─► embeddings.py ─► vectorstore.query(top_k) ─► filtro por umbral
+                │                                  (score ≥ MIN_SCORE 0,805)
                 │                                                  │
                 │          ¿hay contexto relevante? ── no ──► "No encontré esa información…"
                 │                     │ sí
@@ -134,8 +153,11 @@ asistente-rag-ic7/
 │   ├── rag_engine.py          # M7  retrieve + generate + citas
 │   ├── cli.py                 # M5/M7
 │   ├── api.py                 # M8
-│   └── ui_streamlit.py        # M9
+│   ├── api_client.py          # M9  cliente HTTP de la UI
+│   ├── ui_streamlit.py        # M9
+│   └── evaluation.py          # M10 reglas de verificación y reporte
 ├── data/docs/                 # Corpus de documentos internos (M1)
+├── data/uploads/              # Subidas por la API (ignorado en git, ADR-011)
 ├── data/chroma/               # Vector store persistente (ignorado en git)
 ├── tests/unit/ · tests/integration/
 ├── evaluacion/                # M10 preguntas + resultados
@@ -172,9 +194,9 @@ Plan de módulos detallado: [`01_PLAN_MODULOS.md`](01_PLAN_MODULOS.md).
 | Nombre de modelo Gemini cambia / no disponible | Modelo en `.env`; `scripts/check_gemini.py` lista los modelos de la key y confirma el configurado |
 | Créditos de la API key agotados | `LLMQuotaExhaustedError` con mensaje claro en CLI/API/UI para cambiar `GEMINI_API_KEY` (M6–M9) |
 | Fuga de la API key | `.env` ignorado, `test_no_secrets.py`, hook `scripts/pre-commit`, la key nunca se imprime (solo `****` + últimos 4) |
-| Costo o falta de saldo en xAI | Tests unitarios usan `FakeLLM`; solo los tests `integration` llaman a la API |
+| Costo o falta de saldo en Gemini | Tests unitarios usan `FakeLLM`; solo los tests `llm` (opt-in con `RUN_LLM=1`) llaman a la API |
 | Alucinaciones | Prompt estricto, umbral de similitud, respuesta de "no encontrado", citas obligatorias |
-| Primera descarga del modelo de embeddings (~470 MB) | Se descarga una vez en M3 y queda en caché; documentado en README |
+| Primera descarga del modelo de embeddings (~490 MB) | Se descarga una vez en M3 y queda en caché; documentado en README |
 | PDF sin texto extraíble | Fuera de alcance (OCR); se advierte en logs y limitaciones |
 | Tiempo (24–36 h) | Módulos pequeños; M12 (cloud) solo opcional |
 

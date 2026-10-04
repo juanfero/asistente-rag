@@ -52,3 +52,12 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.coverage.run]
+source = ["rag"]
+# La UI se prueba con AppTest (ejecuta el script en otro contexto); se excluye del cálculo (M11-03)
+omit = ["*/rag/ui_streamlit.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true

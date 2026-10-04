@@ -1,17 +1,36 @@
 # Uso de herramientas AI-assisted development
 
-> Requisito 4.3 del caso: documentar **qué herramienta se usó, para qué, qué partes se revisaron manualmente y qué se aprendió.** Se completa al cierre de cada módulo.
+> Requisito 4.3 del caso: documentar **qué herramienta se usó, para qué, qué partes se revisaron manualmente y qué se aprendió.** Se completó al cierre de cada módulo y se consolidó en M11.
+
+**Resumen:** la IA (Claude Code) escribió la mayor parte del código, las pruebas y la documentación, siempre contra criterios de aceptación definidos antes de cada módulo. Las decisiones de diseño, la revisión de cada diff, la validación con datos reales y la revisión manual de la evaluación las hice yo. Abajo están los casos concretos en que corregí a la IA o cambié el rumbo, el registro por módulo y lo que aprendí.
 
 ## Herramientas
 | Herramienta | Uso |
 |---|---|
 | Claude (claude.ai) | Análisis del caso técnico, documento general del proyecto y plan de módulos |
-| Claude Code | Desarrollo módulo por módulo: generación de pruebas e implementación, ejecución de pytest/ruff, documentación |
+| Claude Code | Desarrollo módulo por módulo: generación de pruebas e implementación, ejecución de pytest/ruff, evidencias y documentación |
+| Otra IA (revisión cruzada) | Revisar los reportes de cierre de cada módulo y señalar dudas o inconsistencias antes de aprobar |
 
 ## Forma de trabajo
 1. Se definió primero la documentación (este repositorio `docs/`) con criterios de aceptación por módulo; Claude Code trabaja contra esos criterios, no "libremente".
 2. Cada módulo: la IA propone pruebas + implementación → yo reviso el diff, ejecuto las pruebas, cuestiono decisiones y corrijo → solo se avanza con todo en verde.
 3. Toda decisión relevante queda en `docs/03_DECISIONES.md`.
+4. Al cerrar cada módulo la IA entrega un reporte con la salida literal de pytest y ruff y el estado de cada criterio; yo lo reviso (y lo valido con otra IA) antes de autorizar el commit, el tag y el push.
+
+## Qué revisé y corregí manualmente (ejemplos concretos)
+
+| # | Situación | Qué hice | Resultado |
+|---|---|---|---|
+| 1 | **Modelo de embeddings.** Con MiniLM, una pregunta sin respuesta (Q8) tenía más similitud que una contestable (Q2) y el dato "COP 120.000" quedaba en el puesto 7 | Pedí comparar 3 variantes con un gold set antes de seguir y elegí con los datos | Cambio a `multilingual-e5-small` 800/120: Recall@4 de 87,5 % a 100 % (ADR-009) |
+| 2 | **Regla de errores 429.** La IA clasificaba como "créditos agotados" todo 429 que contuviera "billing" o "quota" | Revisé respuestas reales de Gemini: casi todos los 429 (también los de límite por minuto) incluyen ese texto. Definí una regla en orden: `PerDay` → cuota, `PerMinute` → límite, `prepay`/`credits` → cuota, resto → límite | Mensajes correctos para el usuario y pruebas para cada caso (ADR-010) |
+| 3 | **Q8 con fuentes contradictorias.** La respuesta decía "No encontré información…" pero mostraba fuentes como si la respaldaran | Exigí que, si la respuesta no está basada en documentos, `sources` sea una lista vacía (el contexto recuperado queda solo para depurar) | API, CLI y UI coherentes; criterio M7-05 actualizado |
+| 4 | **Comandos de las evidencias sin comillas.** Los `curl` de `evidencias/M8_curl.txt` no se podían copiar y pegar | Pedí regenerar las evidencias con comandos copiables | Evidencias reproducibles |
+| 5 | **Rutas absolutas del equipo en las evidencias.** Las salidas exponían la ruta local del equipo en un repositorio público | Pedí reemplazarlas por `<repo>` y verificarlo en el cierre | 0 rutas locales en `evidencias/` |
+| 6 | **`hash()` no determinista.** Para el embedder de pruebas se podía usar `hash()` de Python, que cambia entre ejecuciones | Exigí `sha1` | `FakeEmbedder` reproducible entre procesos |
+| 7 | **Enunciado de la prueba en un repositorio público.** Los archivos del caso habían quedado en el historial | Autoricé reescribir el historial con respaldo previo (`git bundle`), `git filter-repo` y `push --force` | Los archivos quedan solo en local; historial verificado |
+| 8 | **Umbral de relevancia.** La IA proponía un umbral que separara preguntas con y sin respuesta | Con los datos de e5 (scores entre 0,81 y 0,90) lo redefiní como filtro de ruido calibrado con legítimas, paráfrasis y fuera de dominio; la abstención en el dominio la decide el LLM | `MIN_SCORE=0.805`: corta 3 de 4 preguntas fuera de dominio sin perder ninguna legítima (ADR-005) |
+| 9 | **Revisión manual de la evaluación.** | Pedí que la IA generara la plantilla pero no la llenara: la revisión de las 9 respuestas la hice yo | 9/9 correctas en la revisión manual |
+| 10 | **Cambio de LLM.** Grok no funcionó con mi cuenta | Decidí pasar a Gemini y puse yo la key en `.env`; la IA nunca la leyó ni la imprimió | ADR-010, escáner de secretos y hook de pre-commit |
 
 ## Registro por módulo
 | Módulo | Para qué se usó la IA | Qué revisé / corregí manualmente | Qué aprendí |
@@ -30,9 +49,25 @@
 | M8 | Claude Code: `api.py` (lifespan con warm-up, LLM lazy, lock, mapeo de errores), `schemas.py`, validación de subidas por contenido, 37 pruebas con TestClient + 1 prueba llm, evidencias con la API levantada | Definí el formato único de errores y su mapeo, la separación `data/uploads/` vs corpus congelado, las reglas 409/403/415, el warm-up y `/health` sin Gemini | En Starlette, el handler de `Exception` re-lanza la excepción: los errores del dominio deben registrarse por clase. Al levantar la API apareció otro servicio local en el puerto 8000 que respondía `/health`: verificar *qué* responde antes de dar por buena una prueba manual |
 | M9 | Claude Code: `api_client.py` (timeouts, errores por código, detección de servicio ajeno), `ui_streamlit.py`, `scripts/run_demo.sh`, 30 pruebas (AppTest con cliente falso + sesión HTTP falsa) | Definí el mapeo de errores a avisos, las reglas de fuentes/badges/contexto, los ejemplos para el video, la protección del corpus en la UI, los timeouts y el script de demo sin `pkill` | La primera ejecución de las pruebas consultó la API real configurada (otro servicio en el puerto 8000) y falló: un script de Streamlit no debe ejecutarse al importarse, y el cliente debe validar que habla con el servicio correcto. En una shell no interactiva SIGINT se ignora en procesos de fondo: la prueba del `trap` se hizo con SIGTERM |
 | M10 | Claude Code: `evaluation.py` (normalización, reglas por tipo, repeticiones, reintentos, resumen, reporte), `run_evaluacion.py`, sets YAML, 20 pruebas sin red, corrida real ×3 y verificación de que los fragmentos citados contienen los datos | Definí las reglas (variantes de hechos, citas con página, frase y tema faltante), las 3 repeticiones con criterio de consistencia, el bloque de robustez y que la revisión manual la hago yo (la IA no la llena) | Una regla automática puede aprobar citas al documento correcto pero al fragmento equivocado: conviene verificar el texto citado. Repetir cada pregunta revela variaciones de formato del LLM sin cambios de contenido. Las pruebas del evaluador no deben depender del orden de recuperación |
-| M11 | | | |
+| M11 | Claude Code: coherencia de la documentación con el stack final, README final, tabla de cambios respecto al plan, guion del video, prueba de instalación desde cero en un clon limpio, cobertura (98 %), verificación de seguridad final e índice de evidencias | Revisé el README y el guion antes de grabar; definí qué entraba en limitaciones y mejoras; pedí que la instalación desde cero se hiciera sin copiar mi `.env` | Una instalación desde cero detecta supuestos que en el equipo de desarrollo pasan inadvertidos (caché del modelo, `.env`, hook). Documentar los cambios respecto al plan explica por qué el resultado difiere de lo previsto |
 
-## Conclusiones (completar en M11)
-- Beneficios observados:
-- Riesgos / errores de la IA detectados:
-- Prácticas que funcionaron (p. ej. pruebas primero, criterios de aceptación explícitos):
+## Conclusiones
+
+**Beneficios observados**
+- Velocidad: el núcleo RAG, la API, la UI, 389 pruebas unitarias y la evaluación se construyeron en pocas sesiones.
+- La IA propone pruebas y casos borde que yo no habría escrito de entrada (formatos de cita, errores de Gemini simulados con el SDK real, archivos con contenido falso).
+- Buena para medir: scripts de comparación de embeddings, calibración del umbral y conteo de tokens que convirtieron opiniones en datos.
+
+**Riesgos y errores de la IA detectados**
+- **Escribir cifras antes de medirlas:** en varios reportes anotó números (conteos de chunks, de hechos, caracteres por token) que luego no coincidían con la medición real; se corrigieron todos. Regla adoptada: medir antes de escribir.
+- **Acciones con efectos colaterales:** un `pkill -f` con patrón amplio cerró su propia shell; un tag quedó en el commit equivocado. Reglas adoptadas: detener procesos por PID y crear el tag solo si el commit tuvo éxito.
+- **Pruebas que dependían del entorno:** las pruebas de la UI consultaron un servicio real del equipo en el puerto 8000; una prueba del evaluador dependía del orden de recuperación del embedder falso.
+- **Heurísticas plausibles pero incorrectas:** la regla de "billing" en los 429 y el umbral como separador de preguntas sin respuesta parecían razonables y no lo eran con datos reales.
+- **Tendencia a "arreglar" una prueba que falla:** se pidió explícitamente detenerse y consultar; en M3.1 la IA se detuvo y la redefinición del criterio la aprobé yo.
+
+**Prácticas que funcionaron**
+- Criterios de aceptación escritos antes de cada módulo y pruebas primero.
+- Inyectar defectos a propósito cuando las pruebas pasan al primer intento, para comprobar que detectan el error.
+- Revisar la salida real (CLI, API, logs), no solo las pruebas: así aparecieron el ruido de logs, el `.env` con valores viejos y el servicio ajeno en el puerto 8000.
+- Reportes de cierre con salida literal y validación cruzada con otra IA.
+- Seguridad desde el principio: key solo en `.env`, enmascarada, escáner de secretos en archivos e historial y hook de pre-commit.

@@ -1,0 +1,20 @@
+$ git log --all -p | python scripts/secret_scan.py --stdin
+0 coincidencias
+
+$ git check-ignore -v .env data/chroma/chroma.sqlite3 data/uploads/ejemplo.pdf
+.gitignore:10:.env	.env
+.gitignore:19:data/chroma/*	data/chroma/chroma.sqlite3
+.gitignore:23:data/uploads/*	data/uploads/ejemplo.pdf
+
+$ git ls-files | grep -E "^\.env$|^data/(chroma|uploads)/"   # solo los .gitkeep
+data/chroma/.gitkeep
+data/uploads/.gitkeep
+
+$ grep -rlE "/ho[m]e/" evidencias evaluacion README.md docs/*.md docs/modulos | wc -l   # rutas absolutas locales
+0
+
+$ cmp scripts/pre-commit .git/hooks/pre-commit && echo "hook instalado"
+hook instalado
+
+$ pytest tests/unit/test_no_secrets.py -q
+17 passed in 0.30s

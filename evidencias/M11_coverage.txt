@@ -1,0 +1,34 @@
+$ pytest -m "not integration" -q --cov=rag --cov-report=term-missing --cov-fail-under=80
+# ui_streamlit.py excluido del cálculo ([tool.coverage.run] omit en pyproject.toml); se prueba con AppTest en tests/unit/test_ui.py
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 92%]
+.............................                                            [100%]
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.10.12-final-0 _______________
+
+Name                      Stmts   Miss  Cover   Missing
+-------------------------------------------------------
+src/rag/__init__.py           1      0   100%
+src/rag/api.py              205      6    97%   113, 152, 161, 202, 303, 352
+src/rag/api_client.py        73      0   100%
+src/rag/chunking.py         100      2    98%   62, 120
+src/rag/cli.py              128      2    98%   119, 190
+src/rag/config.py            48      0   100%
+src/rag/embeddings.py        68      0   100%
+src/rag/evaluation.py       233     12    95%   64, 69, 72, 79, 81, 87, 253-265, 336, 481, 538
+src/rag/ingest.py            67      0   100%
+src/rag/llm.py              109      1    99%   142
+src/rag/loaders.py           78      0   100%
+src/rag/logging_conf.py      18      0   100%
+src/rag/models.py            17      0   100%
+src/rag/prompts.py           14      0   100%
+src/rag/rag_engine.py        85      0   100%
+src/rag/schemas.py           55      0   100%
+src/rag/vectorstore.py       80      0   100%
+-------------------------------------------------------
+TOTAL                      1379     23    98%
+Required test coverage of 80% reached. Total coverage: 98.33%
+389 passed, 12 deselected in 26.81s

@@ -4,8 +4,32 @@ Una entrada por sesión de trabajo / cierre de módulo (más reciente arriba).
 
 > Horas "estimado": calculadas con las marcas de tiempo de git (M0: creación del venv 11:26 → commit 11:39; M1: commit M0 11:39 → commit M1 11:59). Corresponden a la ejecución en sesión con Claude Code y no incluyen la revisión humana fuera de ella.
 
+## Horas por módulo
+
+Estimado del plan (`00_PROYECTO.md` §9) frente al tiempo en sesión con Claude Code (suma de las entradas de abajo, calculado con las marcas de tiempo de git). El tiempo en sesión no incluye la revisión humana fuera de ella (lectura de diffs, validación con otra IA, revisión manual de la evaluación, grabación del video), que fue la mayor parte del trabajo del autor.
+
+| Módulo | Plan (h) | En sesión (h, estimado) | Entradas incluidas |
+|---|---|---|---|
+| Planeación | — | 1,0 | Planeación |
+| M0 Setup | 2 | 0,2 | M0, M0 (ajuste) |
+| M1 Corpus + loaders | 3 | 0,3 | M1 |
+| M2 Chunking | 2 | 0,2 | M2, M2 (fix) |
+| M3 Embeddings | 2 | 0,7 | M3, M3.1 |
+| M4 Vector store | 2,5 | 0,1 | M4 |
+| M5 Ingesta + CLI | 2 | 0,1 | M5 |
+| M6 Cliente LLM Gemini | 2 | 0,6 | chore(llm) Grok → Gemini, M6 |
+| M7 Motor RAG | 4 | 1,5 | M7, fix(M6/M7), fix(M7/M8) |
+| M8 API FastAPI | 3 | 1,1 | M8, README |
+| M9 UI Streamlit | 2,5 | 0,7 | M9 |
+| M10 Evaluación | 2,5 | 0,7 | M10, M10 (cierre) |
+| M11 Documentación + video | 3,5 | 0,6 | M11 |
+| **Total** | **31** | **≈7,8** | |
+
+## Entradas
+
 | Fecha | Módulo | Qué se hizo | Pruebas (pasan/total) | Horas | Próximo paso |
 |---|---|---|---|---|---|
+| 2026-10-04 | M11 | Documentación coherente con el stack final y tabla de cambios respecto al plan (`00_PROYECTO.md` §4.1); README final (embeddings A/B/C, limitaciones reales, mejoras, cobertura, video); `04_USO_AI_ASSISTED.md` consolidado; `05_GUION_VIDEO.md`; instalación desde cero en un clon limpio sin key; cobertura 98 %; seguridad final (0 coincidencias); `evidencias/README.md`; horas por módulo | 392/392 unitarias | ≈0,6 h (estimado) | Enlace del video en el README y tag `v1.0.0` |
 | 2026-10-04 | M10 (cierre) | Revisión manual del autor (9/9) y reporte regenerado con `--solo-reporte`; total manual añadido al resumen | 389/389 unitarias | ≈0,1 h (estimado) | M11 |
 | 2026-10-03 | M10 | Evaluación: `preguntas.yaml` (9) + `preguntas_extra.yaml` (5), `src/rag/evaluation.py`, `scripts/run_evaluacion.py`; corrida real ×3 → **9/9 automáticas, consistencia 3/3, robustez 5/5**; citas verificadas contra el corpus; `revision_manual.yaml` generada para el autor | 389/389 unitarias | ≈0,6 h (estimado) | Revisión manual del autor → `--solo-reporte` → commit `feat(M10)` + tag `M10-ok` |
 | 2026-10-03 | M9 | UI Streamlit (`ui_streamlit.py`) + `api_client.py`: errores por código, badges, fuentes solo si hay respuesta, contexto de depuración, historial, 3 ejemplos, documentos con 🔒/🗑️, timeouts; `scripts/run_demo.sh` (PIDs + trap); detección de servicio ajeno en `API_URL`; README actualizado | 369/369 unitarias; integración 6/6 + 6 skip | ≈0,7 h (estimado) | Capturas M9-05 (autor); commit `feat(M9)` + tag `M9-ok`; luego M10 (evaluación) |
