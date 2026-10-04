@@ -361,7 +361,23 @@ ruff check src tests && ruff format --check src tests
 - Cuando las pruebas pasaron al primer intento, se **inyectaron defectos a propósito** (p. ej. cambiar la métrica a L2, quitar el umbral, no validar el contenido de un archivo) para comprobar que las pruebas los detectan.
 - Las salidas de cada módulo están en [`evidencias/`](evidencias/).
 
-**Evaluación con preguntas de prueba (M10, pendiente):** set de 9 preguntas (3 contestables, 3 parciales, 3 no contestables) con verificación automática y revisión manual → `evaluacion/resultados.md`.
+### Evaluación con preguntas de prueba (M10)
+
+```bash
+python scripts/run_evaluacion.py --repeticiones 3   # 9 preguntas × 3 + bloque de robustez (llama a Gemini)
+python scripts/run_evaluacion.py --solo-reporte     # regenera el reporte con la revisión manual, sin Gemini
+```
+
+Set de 9 preguntas ([`evaluacion/preguntas.yaml`](evaluacion/preguntas.yaml)): 3 contestables, 3 parcialmente contestables y 3 no contestables, más un bloque de robustez (paráfrasis, fuera de dominio e inyección). Cada pregunta se ejecuta 3 veces y solo cuenta como correcta si las 3 repeticiones lo son. La verificación automática (hechos esperados, citas a la fuente y página, frase de parte faltante, abstención) se complementa con una **revisión manual** del autor.
+
+| Resultado | Valor |
+|---|---|
+| Correctas | **9/9** automáticas y **9/9** en la revisión manual (contestables 3/3, parciales 3/3, no contestables 3/3) |
+| Consistencia | 3/3 en las 9 preguntas |
+| Robustez | 5/5 (paráfrasis, fuera de dominio cortada sin LLM, inyección rechazada) |
+| Latencia | p50 7,7 s · p95 12,5 s |
+
+Tabla completa (pregunta, respuesta generada, ¿correcta?, observación): [`evaluacion/resultados.md`](evaluacion/resultados.md).
 
 ---
 
@@ -437,7 +453,7 @@ Se usó **Claude Code** como asistente de desarrollo, módulo por módulo, contr
 | M7 Motor RAG | ✅ |
 | M8 API FastAPI | ✅ |
 | M9 UI Streamlit | ✅ (capturas de la demo pendientes) |
-| M10 Evaluación con preguntas de prueba | ⬜ |
+| M10 Evaluación con preguntas de prueba | ✅ (9/9 automáticas y manuales) |
 | M11 Documentación final, evidencias y video | ⬜ |
 
 Plan y criterios: [`docs/01_PLAN_MODULOS.md`](docs/01_PLAN_MODULOS.md) · documento general: [`docs/00_PROYECTO.md`](docs/00_PROYECTO.md) · bitácora: [`docs/BITACORA.md`](docs/BITACORA.md). Video: *pendiente (M11)*.

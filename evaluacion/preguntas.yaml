@@ -1,0 +1,83 @@
+# Set de evaluación M10: 9 preguntas (3 contestables, 3 parciales, 3 no contestables).
+# La verdad de referencia son los hechos del corpus congelado (docs/modulos/M1_corpus_loaders.md).
+#
+# Campos:
+#   expected_facts: lista de hechos; cada hecho es una lista de variantes aceptadas (basta una).
+#                   Se comparan normalizados: minúsculas, sin tildes y números sin separadores
+#                   de miles ("120.000" = "120000").
+#   expected_sources: fuentes que deben aparecer CITADAS (cited=True); en PDF, con su página.
+#   missing_topic: (parciales) palabra clave del tema que NO está en los documentos y que la
+#                  respuesta debe nombrar tras "Los documentos no incluyen información sobre".
+#   expect_not_found: (no contestables) grounded=False y sources vacío.
+
+preguntas:
+  - id: Q1
+    tipo: contestable
+    pregunta: "¿Cuántos días de vacaciones tengo por año trabajado y con cuánta anticipación debo solicitarlas?"
+    expected_facts:
+      - ["15 dias habiles", "quince dias habiles"]
+      - ["15 dias calendario", "quince dias calendario"]
+    expected_sources:
+      - {source: politica_vacaciones_y_permisos.md}
+
+  - id: Q2
+    tipo: contestable
+    pregunta: "¿Cuál es el tope diario de alimentación en viajes nacionales e internacionales?"
+    expected_facts:
+      - ["120000"]
+      - ["usd 90", "90 usd", "us$ 90", "us$90", "90 dolares"]
+    expected_sources:
+      - {source: manual_reembolso_gastos.pdf, page: 1}
+      - {source: manual_reembolso_gastos.pdf, page: 2}
+
+  - id: Q3
+    tipo: contestable
+    pregunta: "¿Qué requisitos debe cumplir mi contraseña corporativa?"
+    expected_facts:
+      - ["12 caracteres", "doce caracteres"]
+      - ["90 dias", "noventa dias"]
+      - ["ultimas 5", "5 ultimas", "ultimas cinco", "cinco ultimas"]
+    expected_sources:
+      - {source: guia_onboarding_ti.txt}
+
+  - id: Q4
+    tipo: parcial
+    pregunta: "¿Cuántos días de permiso me dan por matrimonio y cómo se pagan las horas extra?"
+    expected_facts:
+      - ["5 dias habiles", "cinco dias habiles"]
+    expected_sources:
+      - {source: politica_vacaciones_y_permisos.md}
+    missing_topic: "horas extra"
+
+  - id: Q5
+    tipo: parcial
+    pregunta: "¿Qué VPN debo usar y me prestan un celular corporativo?"
+    expected_facts:
+      - ["forticlient"]
+    expected_sources:
+      - {source: guia_onboarding_ti.txt}
+    missing_topic: "celular"
+
+  - id: Q6
+    tipo: parcial
+    pregunta: "¿Cuál es el tope de hospedaje en Medellín y cuánto reconocen por kilómetro con vehículo propio?"
+    expected_facts:
+      - ["420000"]
+    expected_sources:
+      - {source: manual_reembolso_gastos.pdf, page: 1}
+    missing_topic: "kilometr"
+
+  - id: Q7
+    tipo: no_contestable
+    pregunta: "¿Cuál es el salario promedio de un analista en Nexa?"
+    expect_not_found: true
+
+  - id: Q8
+    tipo: no_contestable
+    pregunta: "¿Cuántos días a la semana puedo trabajar remoto?"
+    expect_not_found: true
+
+  - id: Q9
+    tipo: no_contestable
+    pregunta: "¿Quién es el CEO de Nexa Logística?"
+    expect_not_found: true

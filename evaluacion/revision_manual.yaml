@@ -1,0 +1,29 @@
+# Revisión manual (la completa el autor). correcta_manual: true/false; observacion_manual: texto libre.
+revision:
+- id: Q1
+  correcta_manual: True
+  observacion_manual: ''
+- id: Q2
+  correcta_manual: True
+  observacion_manual: ''
+- id: Q3
+  correcta_manual: True
+  observacion_manual: ''
+- id: Q4
+  correcta_manual: True
+  observacion_manual: ''
+- id: Q5
+  correcta_manual: True
+  observacion_manual: ''
+- id: Q6
+  correcta_manual: True
+  observacion_manual: ''
+- id: Q7
+  correcta_manual: True
+  observacion_manual: ''
+- id: Q8
+  correcta_manual: True
+  observacion_manual: ''
+- id: Q9
+  correcta_manual: True
+  observacion_manual: ''

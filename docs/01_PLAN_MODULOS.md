@@ -14,7 +14,7 @@ Regla de oro: **un módulo solo se cierra cuando todas sus pruebas pasan** (`pyt
 | M7 | [Motor RAG](modulos/M7_motor_rag.md) | Retrieve + umbral + prompt grounded + respuesta con citas + `rag ask` | R6–R9 | M4–M6 | ✅ Completado |
 | M8 | [API FastAPI](modulos/M8_api.md) | `/health`, `/documents`, `/ingest`, `/ask` | R6 | M7 | ✅ Completado |
 | M9 | [UI Streamlit](modulos/M9_ui_streamlit.md) | Subir documentos, preguntar, ver fuentes | R6 | M8 | ✅ Completado (M9-05 ⏸ capturas manuales) |
-| M10 | [Evaluación con preguntas de prueba](modulos/M10_evaluacion.md) | Set de preguntas (contestable/parcial/no contestable), runner y reporte | R11 | M7 | ⬜ Pendiente |
+| M10 | [Evaluación con preguntas de prueba](modulos/M10_evaluacion.md) | Set de preguntas (contestable/parcial/no contestable), runner y reporte | R11 | M7 | ✅ Completado (9/9 automáticas y manuales) |
 | M11 | [Documentación final y entregables](modulos/M11_documentacion_entrega.md) | README completo, evidencias, uso AI, guion de video, release | R10, R12 | M0–M10 | ⬜ Pendiente |
 | M12 | [Opcional: Docker + Cloud](modulos/M12_opcional_cloud.md) | Contenedor y despliegue (deseable, no obligatorio) | deseable | M11 | ⬜ Opcional |
 
